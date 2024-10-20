@@ -18,15 +18,15 @@ t1 = timeframe(46,1)- timeframe(45,1)
 t11 = t1*10.0000^6
 % the answer is 6.35e-5,if *10^6,it will be us.I think it is enough to
 % caculate the duration
-%%
-% TS4231的Epin以低电平表示根据存储的格式，0表示信号现在开始为0，1表示开始为1.因此只需计算所有0和其紧跟 的1的时间间隔，就能得到所有波的时间。再删除所有小于30us(3e-5
+%% 
+% TS4231的Epin以低电平表示根据存储的格式，0表示信号现在开始为0，1表示开始为1.因此只需计算所有0和其紧跟 的1的时间间隔，就能得到所有波的时间。再删除所有小于30us(3e-5 
 % s)，就得到所有同步 光的时间。
 % scum 则更直观，高电平表示有光，即1表示开始，0表示结束。目前这个文档解析的是scum数据
 
 % 还得加上起始时间戳。
 j = 1;
 for i = 1:length(signaldata_optical)
-
+    
     if (signaldata_optical(i,1) == 1) && (i ~= length(signaldata_optical))
         duration_temp = timeframe(i+1,1) - timeframe(i,1);
         if duration_temp > 3e-5
@@ -44,16 +44,16 @@ current_state = 0;
 last_state = 0;
 for ki = 1:length(signaldata_sync_cal)
     last_state = current_state;
-    current_state= signaldata_sync_cal(ki,1);
-    if (current_state ~= last_state)&&(ki ~= length(signaldata_sync_cal))
-        sync_timestamp(k,1) = timeframe(ki,1);
-        k = k+1;
-    end
+current_state= signaldata_sync_cal(ki,1);
+if (current_state ~= last_state)&&(ki ~= length(signaldata_sync_cal))
+    duration_sync_timestamp(k,1) = timeframe(ki,1);
+    k = k+1;
+end
 end
 % 记录了每个变化时刻后，下一步就是计算间隔长度
 kp = 1;
-for kpi = 1:(length(sync_timestamp(:,1))-1)
-    period_sync_cal(kp,1) = sync_timestamp(kpi+1,1)-sync_timestamp(kpi,1);
+for kpi = 1:(length(duration_sync_timestamp(:,1))-1)
+    period_sync_cal(kp,1) = duration_sync_timestamp(kpi+1,2)-duration_sync_timestamp(kpi,2);
     kp = kp+1;
 end
 %% 计算两波的间隔
@@ -110,7 +110,7 @@ performance_3us = c_3us/length(period)
 
 
 % box off;
-%
+% 
 % % find the start poiont of line 5us
 % h_edge = hist.BinEdges;
 % h_count = hist.BinCounts;
@@ -124,11 +124,11 @@ performance_3us = c_3us/length(period)
 % plot([1;1]*xe1, [(h_count(line1_count_end)+ 100), line1_y_max*1], '-k', 'LineWidth', 1); % 显著性的那条直线的左方下直线
 % % set(gca,'FontName','Times New Roman','FontSize',24);
 % txt1 = {'\pm 5 us: 95.06 %',''};
-%
+% 
 % t1 = text(mean([xs1,xe1]),line1_y_max,txt1)
 % t1.FontSize = 24;
 % t1.FontName = 'Times New Roman';
-%
+% 
 % % find the start poiont of line 10us
 % h_edge = hist.BinEdges;
 % h_count = hist.BinCounts;
@@ -142,11 +142,11 @@ performance_3us = c_3us/length(period)
 % plot([1;1]*xe2, [(h_count(line2_count_end)+ 100), line2_y_max*1], '-k', 'LineWidth', 1); % 显著性的那条直线的左方下直线
 % % set(gca,'FontName','Times New Roman','FontSize',24);
 % txt2 = {'\pm 10 us: 98.70 %',''};
-%
+% 
 % t2 = text(mean([xs2,xe2]),line2_y_max,txt2)
 % t2.FontSize = 24;
 % t2.FontName = 'Times New Roman';
-%
+% 
 % % find the start poiont of line 3us
 % h_edge = hist.BinEdges;
 % h_count = hist.BinCounts;
@@ -160,17 +160,17 @@ performance_3us = c_3us/length(period)
 % plot([1;1]*xe3, [(h_count(line3_count_end)+ 100), line3_y_max*1], '-k', 'LineWidth', 1); % 显著性的那条直线的左方下直线
 % % set(gca,'FontName','Times New Roman','FontSize',24);
 % txt3 = {'\pm 3 us: 82.57 %',''};
-%
+% 
 % t3 = text(mean([xs3,xe3]),line3_y_max,txt3)
 % t3.FontSize = 24;
 % t3.FontName = 'Times New Roman';
-%
+% 
 % ylabel('Counts');
 % xlabel('Sync light period (ms)');
 % set(gca,'linewidth',1.5);
 % plot([1;1]*x(2), [y*1.05, y*1.1], '-k', 'LineWidth', 1); % 显著性的那条直线的右方下直线
 
-%%
+%% 
 mean_data = mean(period);
 var_data = var(period);
 % sigline()
