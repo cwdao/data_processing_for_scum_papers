@@ -56,6 +56,31 @@ for kpi = 1:(length(sync_timestamp(:,1))-1)
     period_sync_cal(kp,1) = sync_timestamp(kpi+1,1)-sync_timestamp(kpi,1);
     kp = kp+1;
 end
+% 这里就是连续12个周期的周期长度计数，100ms，对应12Hz,其40ppm频率差所对应的周期差为max-min = 6.667e-6
+count_40ppm_sync = 0;
+count_80ppm_sync = 0;
+count_100ppm_sync = 0;
+count_300ppm_sync = 0;
+count_400ppm_sync = 0;
+for i = 1:(length(period_sync_cal))
+    if (period_sync_cal(i) >= (0.1-6.667e-6/2)) && (period_sync_cal(i)<=(0.1+6.667e-6/2))
+        count_40ppm_sync = count_40ppm_sync +1;
+    elseif (period_sync_cal(i) >= (0.1-1.333e-5/2)) && (period_sync_cal(i)<=(0.1+1.333e-5/2))
+        count_80ppm_sync = count_80ppm_sync +1;
+    elseif (period_sync_cal(i) >= (0.1-1.667e-5/2)) && (period_sync_cal(i)<=(0.1+1.667e-5/2))
+        count_100ppm_sync = count_100ppm_sync +1;
+    elseif (period_sync_cal(i) >= (0.1-5e-5/2)) && (period_sync_cal(i)<=(0.1+5e-5/2))
+        count_300ppm_sync = count_300ppm_sync +1;
+    else (period_sync_cal(i) >= (0.1-6.667e-5/2)) && (period_sync_cal(i)<=(0.1+6.667e-5/2))
+        count_400ppm_sync = count_400ppm_sync +1;
+    end
+end
+performance_sync_40ppm = count_40ppm_sync/(length(period_sync_cal));
+performance_sync_80ppm = count_80ppm_sync/(length(period_sync_cal))+performance_sync_40ppm;
+performance_sync_100ppm = count_100ppm_sync/(length(period_sync_cal))+performance_sync_80ppm;
+performance_sync_300ppm = count_300ppm_sync/(length(period_sync_cal))+performance_sync_100ppm;
+performance_sync_400ppm = count_400ppm_sync/(length(period_sync_cal))+performance_sync_300ppm;
+
 %% 计算两波的间隔
 
 j2 = 1;
