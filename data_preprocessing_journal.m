@@ -57,29 +57,41 @@ for kpi = 1:(length(sync_timestamp(:,1))-1)
     kp = kp+1;
 end
 % 这里就是连续12个周期的周期长度计数，100ms，对应12Hz,其40ppm频率差所对应的周期差为max-min = 6.667e-6
+% 0.099996666500000-0.100003333500000
 count_40ppm_sync = 0;
 count_80ppm_sync = 0;
 count_100ppm_sync = 0;
+% 0.099983350000000-0.100016650000000
+count_200ppm_sync = 0;
 count_300ppm_sync = 0;
+% 0.099966700000000-0.100033300000000
 count_400ppm_sync = 0;
 for i = 1:(length(period_sync_cal))
     if (period_sync_cal(i) >= (0.1-6.667e-6/2)) && (period_sync_cal(i)<=(0.1+6.667e-6/2))
         count_40ppm_sync = count_40ppm_sync +1;
-    elseif (period_sync_cal(i) >= (0.1-1.333e-5/2)) && (period_sync_cal(i)<=(0.1+1.333e-5/2))
+    end
+    if (period_sync_cal(i) >= (0.1-1.333e-5/2)) && (period_sync_cal(i)<=(0.1+1.333e-5/2))
         count_80ppm_sync = count_80ppm_sync +1;
-    elseif (period_sync_cal(i) >= (0.1-1.667e-5/2)) && (period_sync_cal(i)<=(0.1+1.667e-5/2))
+    end
+    if (period_sync_cal(i) >= (0.1-1.667e-5/2)) && (period_sync_cal(i)<=(0.1+1.667e-5/2))
         count_100ppm_sync = count_100ppm_sync +1;
-    elseif (period_sync_cal(i) >= (0.1-5e-5/2)) && (period_sync_cal(i)<=(0.1+5e-5/2))
+    end
+    if (period_sync_cal(i) >= (0.1-3.333e-5/2)) && (period_sync_cal(i)<=(0.1+3.333e-5/2))
+        count_200ppm_sync = count_200ppm_sync +1;
+    end
+    if (period_sync_cal(i) >= (0.1-5e-5/2)) && (period_sync_cal(i)<=(0.1+5e-5/2))
         count_300ppm_sync = count_300ppm_sync +1;
-    else (period_sync_cal(i) >= (0.1-6.667e-5/2)) && (period_sync_cal(i)<=(0.1+6.667e-5/2))
+    end
+    if (period_sync_cal(i) >= (0.1-6.667e-5/2)) && (period_sync_cal(i)<=(0.1+6.667e-5/2))
         count_400ppm_sync = count_400ppm_sync +1;
     end
 end
 performance_sync_40ppm = count_40ppm_sync/(length(period_sync_cal));
-performance_sync_80ppm = count_80ppm_sync/(length(period_sync_cal))+performance_sync_40ppm;
-performance_sync_100ppm = count_100ppm_sync/(length(period_sync_cal))+performance_sync_80ppm;
-performance_sync_300ppm = count_300ppm_sync/(length(period_sync_cal))+performance_sync_100ppm;
-performance_sync_400ppm = count_400ppm_sync/(length(period_sync_cal))+performance_sync_300ppm;
+performance_sync_80ppm = count_80ppm_sync/(length(period_sync_cal));
+performance_sync_100ppm = count_100ppm_sync/(length(period_sync_cal));
+performance_sync_200ppm = count_200ppm_sync/(length(period_sync_cal));
+performance_sync_300ppm = count_300ppm_sync/(length(period_sync_cal));
+performance_sync_400ppm = count_400ppm_sync/(length(period_sync_cal));
 
 %% 计算两波的间隔
 
@@ -118,7 +130,36 @@ end
 
 performance_3us = c_3us/length(period)
 
-%% plot figure
+%% plot figure 原始周期图
+% figure(1)
+% set(gca,'FontName','Times New Roman','FontSize',24,'linewidth',1.5, ...
+%     'XMinorGrid','off','YMinorGrid','off','box','off');
+figure(101)
+ylabel('Counts');
+xlabel('Sync light periods (ms)');
+hold on
+% 放大坐标到ms
+period_show = period * 1000;
+h101 = histogram(period_show);
+h101.EdgeColor = "black";
+h101.FaceColor = "#e89776";
+h101.LineWidth = 1;
+set(gca,'FontName','Times New Roman','FontSize',24,'linewidth',1.5, ...
+    'XMinorGrid','on','YMinorGrid','on','box','on');
+% 计算 40ppm的范围,+3.33e-7s, 也就是0.33 us
+origin_40ppm = 0;
+% origin_40ppm_mean = mean(period);
+for i = 1:(length(period))
+    if (period(i) >= mean(period)-3.333e-7) && (period(i)<=mean(period)+3.333e-7)
+        origin_40ppm = origin_40ppm +1;
+    end
+end
+
+performance_40ppm_origin = origin_40ppm/length(period);
+
+
+
+
 % figure(1)
 % set(gca,'FontName','Times New Roman','FontSize',24);
 % % ylabel('字体设置为宋体','FontName','宋体','FontSize',24);
@@ -213,7 +254,7 @@ period_diff = period - pd.mu;
 % plot(period_diff);
 period_diff_us = period_diff * 120.;
 %%  累计误差会如何？
-cumu_timewin = 10;
+cumu_timewin = 12;
 cumu_timestep = 1;
 j = 1;
 for i = 1:cumu_timestep:length(period)-cumu_timewin
@@ -221,11 +262,10 @@ for i = 1:cumu_timestep:length(period)-cumu_timewin
     j = j + 1;
 end
 % figure(1)
-set(gca,'FontName','Times New Roman','FontSize',24,'linewidth',1.5, ...
-    'XMinorGrid','off','YMinorGrid','off','box','off');
+
 figure(1)
 ylabel('Counts');
-xlabel('Average of 10 sync light periods (ms)');
+xlabel('Average of 12 sync light periods (ms)');
 hold on
 % 放大坐标到ms
 cumu_t1_show = cumu_t1 * 1000.
@@ -233,6 +273,8 @@ h2 = histogram(cumu_t1_show);
 h2.EdgeColor = "black";
 h2.FaceColor = "#e89776";
 h2.LineWidth = 1;
+set(gca,'FontName','Times New Roman','FontSize',24,'linewidth',1.5, ...
+    'XMinorGrid','on','YMinorGrid','on','box','on');
 
 % 计算 40ppm的范围,+3.33e-7s, 也就是0.33 us
 cumu_40ppm = 0;
@@ -259,14 +301,29 @@ performance_40ppm = cumu_40ppm/length(cumu_t1)
 % set(gca, 'XMinorGrid','on');
 % set(gca, 'YMinorGrid','on');
 % legend( 'single period', 'average of 10 periods', 'average of 20 periods');
+%% 绘制sync cal period 图
+% figure(3)
+
+figure(3)
+ylabel('Counts');
+xlabel('sync light calibration periods (ms)');
+hold on
+% 放大坐标到ms
+period_sync_cal_show = period_sync_cal * 1000.
+h5 = histogram(period_sync_cal_show);
+h5.EdgeColor = "black";
+h5.FaceColor = "0.93,0.69,0.13";
+h5.LineWidth = 1;
+set(gca,'FontName','Times New Roman','FontSize',24,'linewidth',1.5, ...
+    'XMinorGrid','on','YMinorGrid','on','box','on');
 
 %% 绘制周期波动图
 
 % figure(2)
 % set(gca,'FontName','Times New Roman','FontSize',24,'linewidth',1.5, ...
-%     'XMinorGrid','off','YMinorGrid','off','box','off');
+%     'XMinorGrid','on','YMinorGrid','on','box','on');
 figure(2)
-ylabel('Duration(ms)');
+ylabel('Duration (ms)');
 xlabel('Periods');
 hold on
 % 放大坐标到ms
@@ -277,3 +334,6 @@ h2 = plot(period_show);
 h2.LineWidth = 1;
 % set(gca,'FontName','Times New Roman','FontSize',24,'linewidth',1.5, ...
 %     'XMinorGrid','off','YMinorGrid','off','box','off');
+% 这是对前文起效？
+set(gca,'FontName','Times New Roman','FontSize',24,'linewidth',1.5, ...
+    'XMinorGrid','on','YMinorGrid','on','box','on');
