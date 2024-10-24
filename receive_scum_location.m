@@ -10,6 +10,10 @@ s = serialport('COM18', 19200, 'Timeout', 10); % 设置为COM18和波特率19200
 data = [];
 
 % 开始计时
+figure('KeyPressFcn', @setKeyPress); % 设置回调函数
+global keyPressed;
+keyPressed = false;
+
 tic;
 while toc < 10  % 持续10秒
     try
@@ -29,6 +33,13 @@ while toc < 10  % 持续10秒
     catch
         disp('未收到数据或读取发生错误');
     end
+    
+    % 检查键盘输入
+    if keyPressed
+        fprintf('手动终止\n');
+        break;
+    end
+    
     pause(0.1); % 暂停以避免过多占用CPU
 end
 
@@ -40,3 +51,10 @@ disp(dataTable);
 
 % 关闭串口
 clear s;
+
+function setKeyPress(~, event)
+    global keyPressed;
+    if strcmp(event.Key, 'q') % 设定为按下 'q' 时终止
+        keyPressed = true;
+    end
+end
