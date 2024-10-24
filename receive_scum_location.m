@@ -4,7 +4,7 @@ clear;
 
 %% 
 % 设置串口
-s = serialport('COM18', 19200, 'Timeout', 10); % 设置为COM18和波特率19200
+s = serialport('COM15', 38400, 'Timeout', 10); % 设置为COM18和波特率19200
 
 % 初始化数据存储
 data = [];
