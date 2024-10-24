@@ -21,7 +21,7 @@ tic;
 while toc < 1000 && ~stopFlag  % 持续10秒或直到手动停止
     try
         line = strtrim(readline(s)); % 从串口读取一行数据并去除两端空格
-        disp(['Received: ', line]); % 打印接收到的数据
+        % disp(['Received: ', line]); % 打印接收到的数据
         
         % 使用正则表达式提取变量
         tokens = regexp(line, 'A_X:\s*(\d+),\s*A_Y:\s*(\d+),\s*B_X:\s*(\d+),\s*B_Y:\s*(\d+)', 'tokens');
@@ -29,7 +29,7 @@ while toc < 1000 && ~stopFlag  % 持续10秒或直到手动停止
             values = str2double(tokens{1});
             labeledValues = [values, currentLabel]; % 添加标签
             data = [data; labeledValues]; % 将数据追加到数组中
-            disp('Parsed values with label:');
+            % disp('Parsed values with label:');
             disp(labeledValues); % 打印解析出的数据和标签
         else
             disp('No matches found.');
@@ -38,7 +38,7 @@ while toc < 1000 && ~stopFlag  % 持续10秒或直到手动停止
         disp('未收到数据或读取发生错误');
     end
     
-    pause(0.1); % 暂停以避免过多占用CPU
+    % pause(0.1); % 暂停以避免过多占用CPU
 end
 
 % 将数据转换为表格并设置列名
@@ -49,6 +49,15 @@ disp(dataTable);
 
 % 关闭串口
 clear s;
+
+% 获取当前日期和时间
+timestamp = datetime('now', 'Format', 'yyyy-MM-dd_HH-mm');
+
+% 创建文件名
+filename = sprintf('data_%s.mat', char(timestamp));
+
+% 保存数据到MAT文件
+save(filename, 'dataTable','data');
 
 function setKeyPress(~, event)
     global currentLabel;
@@ -61,3 +70,5 @@ function setKeyPress(~, event)
         fprintf('手动终止\n');
     end
 end
+
+
