@@ -3,11 +3,26 @@ clc;
 clear;
 
 load("data_2024-10-26_16-28_p2point.mat");
+% # 单位mm
+lighthouse_height = 550;
+% # 120Hz for sync light
+lighthouse_freq = 120; 
+% # 120Hz~=0.00833s
+lighthouse_period = 1 / lighthouse_freq; 
+lighthouse_angular_velocity = 2 * pi * lighthouse_freq;
+% # @10M,1s= 10,000,000 ticks
+resolution = 10000000; 
 %%
 % 取点数据
 ax = data(:,1);
 ay = data(:,2);
 point_label = data(:,5);
+% 先直接给位置
+j = 1;
+for i=1:length(point_label)
+    [point_xy(j,1),point_xy(j,2)] = get_position(ax(i,1),ay(i,1),lighthouse_height,resolution);
+    j = j+1;
+end
 % 提取前两个校正点，首先给了标签9和8，分别是左上和右下的点
 calib_left= [];
 i = 1;
@@ -16,13 +31,13 @@ k = 1;
 % 循环条件希望在看到第一个1标签之后就停下来，以免重复，后面的8，9不是校正点
 while (point_label(i,1) ~=1)
     if (point_label(i,1)  == 9)
-        calib_left(j,1) = ax(i,1);
-        calib_left(j,2) = ay(i,1);
+        calib_left(j,1) = point_xy(i,1);
+        calib_left(j,2) = point_xy(i,2);
         j = j +1;
     end
     if (point_label(i,1)  == 8)
-        calib_right(k,1) = ax(i,1);
-        calib_right(k,2) = ay(i,1);
+        calib_right(k,1) = point_xy(i,1);
+        calib_right(k,2) = point_xy(i,2);
         k = k+1;
     end
     i = i+1;
@@ -31,7 +46,55 @@ end
 point_calib_l = mean(calib_left);
 point_calib_r = mean(calib_right);
 
+%% 计算坐标变换参数，设置新的原点和实际坐标系
+% 原始坐标
+x1 = point_calib_l(1,1); y1 = point_calib_l(1,2);
+x2 = point_calib_r(1,1); y2 = point_calib_r(1,2);
 
+% 目标坐标
+x1_prime = 100; y1_prime = 150;
+x2_prime = 250; y2_prime = 100;
+
+% 计算缩放因子
+s_x = (x2_prime - x1_prime) / (x2 - x1);
+s_y = (y2_prime - y1_prime) / (y2 - y1);
+
+% 计算偏移量
+t_x = x1_prime - s_x * x1;
+t_y = y1_prime - s_y * y1;
+
+% 转换函数
+% transform_point = @(x, y) deal(s_x * x + t_x, s_y * y + t_y);
+point_calibed_xy(:,1) = point_xy(:,1)*s_x+t_x;
+point_calibed_xy(:,2) = point_xy(:,2)*s_y+t_y;
+%% 删除非静态点数据
+i = 1;
+j = 1;
+for i=1:length(point_label)
+    if (point_label(i,1)~=0)
+        point_stable(j,1) = point_calibed_xy(i,1);
+        point_stable(j,2) = point_calibed_xy(i,2);
+        j = j+1;
+    end
+end
+% scatter(point_calibed_xy(:,1),point_calibed_xy(:,2),point_stable(:,1),point_stable(:,2))
+% 创建图形窗口
+figure;
+
+% 绘制第一个数组
+scatter(point_calibed_xy(:,1), point_calibed_xy(:,2), 'filled', 'MarkerFaceColor', 'b');
+hold on; % 保持当前图形
+
+% 绘制第二个数组
+scatter(point_stable(:,1), point_stable(:,2), 'filled', 'MarkerFaceColor', 'r');
+
+% 添加图例
+legend('moving', 'stable');
+
+% 添加标题和标签
+title('Scatter Plot of Two Arrays');
+xlabel('X-axis');
+ylabel('Y-axis');
 %% 更换代码
 
 % 理想点
@@ -82,28 +145,4 @@ function plot_error_ellipse(C, mu)
     t = linspace(0, 2*pi, 100);
     a = (V * sqrt(D)) * [cos(t(:))'; sin(t(:))'];
     plot(a(1, :) + mu(1), a(2, :) + mu(2), 'r--', 'LineWidth', 1);
-end
-
-function calculate_position()
-# 计算实际位置需要的参数
-lighthouse_height = 550  # 单位mm
-lighthouse_freq = 120  # 120Hz for sync light
-lighthouse_period = 1 / lighthouse_freq  # 120Hz~=0.00833s
-lighthouse_angular_velocity = 2 * math.pi * lighthouse_freq
-resolution = 10000000  # @10M,1s= 10,000,000 ticks
-
-
-# 当前版本的角度计算方法是一种更易理解的形式，即时间/周期*pi。
-# 获得角度后，根据简单的三角函数方法就能计算得到相应的X，Y相对坐标。
-def get_position(time_x, time_y, height_lh, resolution):
-
-    time_motor_ax = time_x / resolution  # seconds
-    time_motor_ay = time_y / resolution
-    theta_ax = time_motor_ax / lighthouse_period * math.pi  # now in radians
-    theta_ay = time_motor_ay / lighthouse_period * math.pi
-    max_side_x = height_lh / math.sin(theta_ax)
-    max_side_y = height_lh / math.sin(theta_ay)
-    x_p = max_side_x * math.cos(theta_ax)
-    y_p = max_side_y * math.cos(theta_ay)
-    return x_p, y_p
 end
