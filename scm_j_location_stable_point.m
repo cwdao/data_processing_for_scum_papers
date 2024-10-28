@@ -13,7 +13,7 @@ lighthouse_angular_velocity = 2 * pi * lighthouse_freq;
 % # @10M,1s= 10,000,000 ticks
 resolution = 10000000; 
 %% 标签定义
-% 采集代码中只有0-9共10个标签，第一个点是左上校正点，标签9，第二个点是右下校正点，标签8，然后从1-9-1如此往复
+% 采集代码中只有0-9共10个标签，第一个点是右下校正点，标签9，第二个点是左上校正点，标签8，然后从1-9-1如此往复
 % 取点数据
 ax = data(:,1);
 ay = data(:,2);
@@ -32,13 +32,13 @@ k = 1;
 % 循环条件希望在看到第一个1标签之后就停下来，以免重复，后面的8，9不是校正点
 while (point_label(i,1) ~=1)
     if (point_label(i,1)  == 9)
-        calib_left(j,1) = point_xy(i,1);
-        calib_left(j,2) = point_xy(i,2);
+        calib_right(j,1) = point_xy(i,1);
+        calib_right(j,2) = point_xy(i,2);
         j = j +1;
     end
     if (point_label(i,1)  == 8)
-        calib_right(k,1) = point_xy(i,1);
-        calib_right(k,2) = point_xy(i,2);
+        calib_left(k,1) = point_xy(i,1);
+        calib_left(k,2) = point_xy(i,2);
         k = k+1;
     end
     i = i+1;
@@ -91,7 +91,7 @@ scatter(point_stable(:,1), point_stable(:,2), 'filled', 'MarkerFaceColor', [0.9,
 
 % 添加图例
 legend('moving', 'stable');
-
+axis equal
 % 添加标题和标签
 title('Scatter Plot of Two Arrays');
 xlabel('X-axis (mm)');

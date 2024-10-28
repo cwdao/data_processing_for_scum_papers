@@ -2,7 +2,10 @@
 clc;
 clear;
 
-load("data_2024-10-26_16-28_p2point.mat");
+% load("data_2024-10-26_16-28_p2point.mat");
+% 这是连续轨迹
+% load("data_2024-10-26_16-40linetrack1.mat");
+load("data_2024-10-26_16-45linetrack2.mat");
 % # 单位mm
 lighthouse_height = 550;
 % # 120Hz for sync light
@@ -14,6 +17,7 @@ lighthouse_angular_velocity = 2 * pi * lighthouse_freq;
 resolution = 10000000; 
 %% 标签定义
 % 采集代码中只有0-9共10个标签，第一个点是左上校正点，标签9，第二个点是右下校正点，标签8，然后从1-9-1如此往复
+% 但没有校正这一步时，就不需要这么做了
 % 取点数据
 ax = data(:,1);
 ay = data(:,2);
@@ -24,28 +28,39 @@ for i=1:length(point_label)
     [point_xy(j,1),point_xy(j,2)] = get_position(ax(i,1),ay(i,1),lighthouse_height,resolution);
     j = j+1;
 end
-% 提取前两个校正点，首先给了标签9和8，分别是左上和右下的点
-calib_left= [];
-i = 1;
-j = 1;
-k = 1;
-% 循环条件希望在看到第一个1标签之后就停下来，以免重复，后面的8，9不是校正点
-while (point_label(i,1) ~=1)
-    if (point_label(i,1)  == 9)
-        calib_left(j,1) = point_xy(i,1);
-        calib_left(j,2) = point_xy(i,2);
-        j = j +1;
-    end
-    if (point_label(i,1)  == 8)
-        calib_right(k,1) = point_xy(i,1);
-        calib_right(k,2) = point_xy(i,2);
-        k = k+1;
-    end
-    i = i+1;
-end
+% % 提取前两个校正点，首先给了标签9和8，分别是左上和右下的点
+% calib_left= [];
+% i = 1;
+% j = 1;
+% k = 1;
+% % 循环条件希望在看到第一个1标签之后就停下来，以免重复，后面的8，9不是校正点
+% while (point_label(i,1) ~=1)
+%     if (point_label(i,1)  == 9)
+%         calib_left(j,1) = point_xy(i,1);
+%         calib_left(j,2) = point_xy(i,2);
+%         j = j +1;
+%     end
+%     if (point_label(i,1)  == 8)
+%         calib_right(k,1) = point_xy(i,1);
+%         calib_right(k,2) = point_xy(i,2);
+%         k = k+1;
+%     end
+%     i = i+1;
+% end
 
-point_calib_l = mean(calib_left);
-point_calib_r = mean(calib_right);
+% point_calib_l = mean(calib_left)
+% point_calib_r = mean(calib_right)
+% 已在上次实验中算出来了
+% point_calib_l =
+% 
+%   -35.6685 -132.3418
+% 
+% 
+% point_calib_r =
+% 
+%  -202.5305 -172.0877
+point_calib_r =[-35.6685,-132.3418]
+point_calib_l =[-202.5305,-172.0877]
 
 %% 计算坐标变换参数，设置新的原点和实际坐标系
 % 原始坐标
@@ -81,7 +96,6 @@ end
 % scatter(point_calibed_xy(:,1),point_calibed_xy(:,2),point_stable(:,1),point_stable(:,2))
 % 创建图形窗口
 figure;
-
 % 绘制第一个数组
 scatter(point_calibed_xy(:,1), point_calibed_xy(:,2), 'filled', 'MarkerFaceColor', [0.1, 0.5, 0.9], 'MarkerEdgeColor', 'none');
 hold on; % 保持当前图形
@@ -90,8 +104,8 @@ hold on; % 保持当前图形
 scatter(point_stable(:,1), point_stable(:,2), 'filled', 'MarkerFaceColor', [0.9, 0.3, 0.1], 'MarkerEdgeColor', 'none');
 
 % 添加图例
-legend('moving', 'stable');
-
+legend('rest', 'tracking');
+axis equal
 % 添加标题和标签
 title('Scatter Plot of Two Arrays');
 xlabel('X-axis (mm)');
