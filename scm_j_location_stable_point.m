@@ -44,8 +44,31 @@ while (point_label(i,1) ~=1)
     i = i+1;
 end
 
-point_calib_l = mean(calib_left);
-point_calib_r = mean(calib_right);
+
+% 尝试去除异常值
+
+% 查找并去除异常值
+outliers_rx = isoutlier(calib_right(:,1));
+outliers_ry = isoutlier(calib_right(:,2));
+outliers_lx = isoutlier(calib_left(:,1));
+outliers_ly = isoutlier(calib_left(:,2));
+
+% 仅保留非异常值
+filtered_data_rp = calib_right(~outliers_rx & ~outliers_ry, :);
+filtered_data_lp = calib_left(~outliers_lx & ~outliers_ly, :);
+
+% 计算过滤后数据的均值
+mean_values_rp = mean(filtered_data_rp);
+mean_values_lp = mean(filtered_data_lp);
+
+% 打印结果
+fprintf('Filtered Mean rX: %.4f\n', mean_values_rp(1));
+fprintf('Filtered Mean rY: %.4f\n', mean_values_rp(2));
+fprintf('Filtered Mean lX: %.4f\n', mean_values_lp(1));
+fprintf('Filtered Mean lY: %.4f\n', mean_values_lp(2));
+% 回到原接口
+point_calib_l = mean_values_lp;
+point_calib_r = mean_values_rp;
 
 %% 计算坐标变换参数，设置新的原点和实际坐标系
 % 原始坐标

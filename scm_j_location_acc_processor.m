@@ -47,20 +47,39 @@ end
 %     end
 %     i = i+1;
 % end
+% 尝试去除异常值
+% 
+% % 查找并去除异常值
+% outliers_rx = isoutlier(calib_right(:,1));
+% outliers_ry = isoutlier(calib_right(:,2));
+% outliers_lx = isoutlier(calib_left(:,1));
+% outliers_ly = isoutlier(calib_left(:,2));
+% 
+% % 仅保留非异常值
+% filtered_data_rp = calib_right(~outliers_rx & ~outliers_ry, :);
+% filtered_data_lp = calib_left(~outliers_lx & ~outliers_ly, :);
+% 
+% % 计算过滤后数据的均值
+% mean_values_rp = mean(filtered_data_rp);
+% mean_values_lp = mean(filtered_data_lp);
+% 
+% % 打印结果
+% fprintf('Filtered Mean rX: %.4f\n', mean_values_rp(1));
+% fprintf('Filtered Mean rY: %.4f\n', mean_values_rp(2));
+% fprintf('Filtered Mean lX: %.4f\n', mean_values_lp(1));
+% fprintf('Filtered Mean lY: %.4f\n', mean_values_lp(2));
+% % 回到原接口
+% point_calib_l = mean_values_lp;
+% point_calib_r = mean_values_rp;
 
-% point_calib_l = mean(calib_left)
-% point_calib_r = mean(calib_right)
 % 已在上次实验中算出来了
-% point_calib_l =
-% 
-%   -35.6685 -132.3418
-% 
-% 
-% point_calib_r =
-% 
-%  -202.5305 -172.0877
-point_calib_r =[-35.6685,-132.3418]
-point_calib_l =[-202.5305,-172.0877]
+% Filtered Mean rX: -28.2542
+% Filtered Mean rY: -132.9572
+% Filtered Mean lX: -210.8488
+% Filtered Mean lY: -197.8404
+
+point_calib_r =[-28.2542,-132.9572]
+point_calib_l =[-210.8488,-197.8404]
 
 %% 计算坐标变换参数，设置新的原点和实际坐标系
 % 原始坐标
@@ -161,3 +180,4 @@ function plot_error_ellipse(C, mu)
     a = (V * sqrt(D)) * [cos(t(:))'; sin(t(:))'];
     plot(a(1, :) + mu(1), a(2, :) + mu(2), 'r--', 'LineWidth', 1);
 end
+
