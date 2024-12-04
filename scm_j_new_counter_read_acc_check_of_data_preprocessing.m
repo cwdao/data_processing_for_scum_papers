@@ -6,58 +6,60 @@ clear;
 % raw_data = readtable("digital_synccheck.csv");
 % the journal paper data
 raw_data = readtable("new_counter_read_acc_check_5min.csv");
-%%
+%% 加载变量
+% 时间戳
 timeframe = raw_data.Time_s_;
+% 原始同步光信号
 signaldata_optical = raw_data.dataRawIo3;
 % signaldata_sync_cal = raw_data.Channel6;
+% while循环读取到的信号
 signaldata_sync_read = raw_data.IO10;
 
 % data_p1 = timetable(timeline,signalline);
-%%
+
+%%小小测一下数据，看看单位
 % plot(timeframe,signaldata);
 t1 = timeframe(8,1)- timeframe(7,1)
 t11 = t1*10.0000^6
 % the answer is 6.35e-5,if *10^6,it will be us.I think it is enough to
 % caculate the duration
-%%
+%% test
+threshold = 3e-5;
+    % 计算信号的差分，检测上升沿和下降沿
+    signal_diff = diff(signaldata_optical);
+
+    % 找到上升沿和下降沿的索引
+    rising_edges = find(signal_diff == 1);   % 上升沿（从 0 到 1）
+    falling_edges = find(signal_diff == -1); % 下降沿（从 1 到 0）
+
+    % 确保每个上升沿都有对应的下降沿（避免未闭合的高电平）
+    num_edges = min(length(rising_edges), length(falling_edges));
+    rising_edges = rising_edges(1:num_edges);
+    falling_edges = falling_edges(1:num_edges);
+
+    % 计算高电平持续时间
+    high_durations = timeframe(falling_edges) - timeframe(rising_edges);
+
+    % 筛选高电平持续时间大于阈值的记录
+    valid_indices = find(high_durations > threshold);
+
+    % 输出结果矩阵：每行是 [高电平持续时间, 起始时间]
+    duration = [high_durations(valid_indices), timeframe(rising_edges(valid_indices))];
+%% 计算光的持续时间
 % TS4231的Epin以低电平表示根据存储的格式，0表示信号现在开始为0，1表示开始为1.因此只需计算所有0和其紧跟 的1的时间间隔，就能得到所有波的时间。再删除所有小于30us(3e-5
 % s)，就得到所有同步 光的时间。
 % scum 则更直观，高电平表示有光，即1表示开始，0表示结束。目前这个文档解析的是scum数据
 
-% 还得加上起始时间戳。
-j = 1;
-for i = 1:length(signaldata_optical)
 
-    if (signaldata_optical(i,1) == 1) && (i ~= length(signaldata_optical))
-        duration_temp = timeframe(i+1,1) - timeframe(i,1);
-        if duration_temp > 3e-5
-            duration(j,1) = timeframe(i+1,1) - timeframe(i,1);
-            duration(j,2) = timeframe(i,1);
-            j = j + 1;
-        end
-    end
-end
+% 设置时间间隔阈值，区分扫描和同步光
+threshold = 3e-5;  % 30us
 
+% 计算 optical 信号的时间间隔
+duration_optical = calculate_high_level_duration(signaldata_optical, timeframe, threshold);
+
+% 计算 sync_read 信号的时间间隔
 % 现在想看看读完counter再翻转IO后得到的波形，可以认为是实际读出来的时间
-j = 1;
-for i = 1:length(signaldata_sync_read)
-
-    if (signaldata_sync_read(i,1) == 1) && (i ~= length(signaldata_sync_read))
-        duration_sync_read_temp = timeframe(i+1,1) - timeframe(i,1);
-        if duration_sync_read_temp > 3e-5
-            duration_sync_read(j,1) = timeframe(i+1,1) - timeframe(i,1);
-            duration_sync_read(j,2) = timeframe(i,1);
-            j = j + 1;
-        end
-    end
-end
-
-indices = find(signaldata_optical == 1);  % 找到所有值为 1 的索引
-valid_indices = indices(indices ~= length(signaldata_optical));  % 去掉最后一个索引
-time_diffs = timeframe(valid_indices + 1) - timeframe(valid_indices);  % 计算时间间隔
-valid_time_diffs = time_diffs > 3e-5;  % 筛选大于阈值的间隔
-duration_new = [time_diffs(valid_time_diffs), timeframe(valid_indices(valid_time_diffs))]; 
-is_eq = isequal(duration, duration_new)%两种方法确实一样
+duration_sync_read = calculate_high_level_duration(signaldata_sync_read, timeframe, threshold);
 
 %% 计算每个synclight cal的周期
 
@@ -79,92 +81,47 @@ is_eq = isequal(duration, duration_new)%两种方法确实一样
 %     period_sync_cal(kp,1) = sync_timestamp(kpi+1,1)-sync_timestamp(kpi,1);
 %     kp = kp+1;
 % end
-% % 这里就是连续12个周期的周期长度计数，100ms，对应12Hz,其40ppm频率差所对应的周期差为max-min = 6.667e-6
-% % 0.099996666500000-0.100003333500000
-% count_40ppm_sync = 0;
-% count_80ppm_sync = 0;
-% count_100ppm_sync = 0;
-% % 0.099983350000000-0.100016650000000
-% count_200ppm_sync = 0;
-% count_300ppm_sync = 0;
-% % 0.099966700000000-0.100033300000000
-% count_400ppm_sync = 0;
-% for i = 1:(length(period_sync_cal))
-%     if (period_sync_cal(i) >= (0.1-6.667e-6/2)) && (period_sync_cal(i)<=(0.1+6.667e-6/2))
-%         count_40ppm_sync = count_40ppm_sync +1;
-%     end
-%     if (period_sync_cal(i) >= (0.1-1.333e-5/2)) && (period_sync_cal(i)<=(0.1+1.333e-5/2))
-%         count_80ppm_sync = count_80ppm_sync +1;
-%     end
-%     if (period_sync_cal(i) >= (0.1-1.667e-5/2)) && (period_sync_cal(i)<=(0.1+1.667e-5/2))
-%         count_100ppm_sync = count_100ppm_sync +1;
-%     end
-%     if (period_sync_cal(i) >= (0.1-3.333e-5/2)) && (period_sync_cal(i)<=(0.1+3.333e-5/2))
-%         count_200ppm_sync = count_200ppm_sync +1;
-%     end
-%     if (period_sync_cal(i) >= (0.1-5e-5/2)) && (period_sync_cal(i)<=(0.1+5e-5/2))
-%         count_300ppm_sync = count_300ppm_sync +1;
-%     end
-%     if (period_sync_cal(i) >= (0.1-6.667e-5/2)) && (period_sync_cal(i)<=(0.1+6.667e-5/2))
-%         count_400ppm_sync = count_400ppm_sync +1;
-%     end
-% end
-% performance_sync_40ppm = count_40ppm_sync/(length(period_sync_cal));
-% performance_sync_80ppm = count_80ppm_sync/(length(period_sync_cal));
-% performance_sync_100ppm = count_100ppm_sync/(length(period_sync_cal));
-% performance_sync_200ppm = count_200ppm_sync/(length(period_sync_cal));
-% performance_sync_300ppm = count_300ppm_sync/(length(period_sync_cal));
-% performance_sync_400ppm = count_400ppm_sync/(length(period_sync_cal));
+
 
 %% 计算两波的间隔
+
+% 设置时间间隔阈值和范围
+threshold = 0.01;  % 时间间隔小于 0.01 秒筛选
+range = [0.008323, 0.008343];  % 计数范围
 % optical_data_raw的
-j2 = 1;
-c_good = 0;
-for i = 1:(length(duration(:,1))-1)
-    period_temp = duration(i+1,2)-duration(i,2);
-    if period_temp < 0.01
-        period(j2) = period_temp;
-        j2 = j2 + 1;
-        if period_temp >=0.008323 && period_temp <= 0.008343
-            c_good = c_good +1;
-        end
-    end
-end
+[period_optical, c_good_optical] = calculate_period_vectorized(duration_optical, threshold, range);
 % while读出来的
-j2 = 1;
-c_good_sync_read = 0;
-for i = 1:(length(duration_sync_read(:,1))-1)
-    period_temp = duration_sync_read(i+1,2)-duration_sync_read(i,2);
-    if period_temp < 0.01
-        period(j2) = period_temp;
-        j2 = j2 + 1;
-        if period_temp >=0.008323 && period_temp <= 0.008343
-            c_good = c_good +1;
-        end
-    end
-end
+[period_sync_read, c_good_sync_read] = calculate_period_vectorized(duration_sync_read, threshold, range);
+
+
 %%
 % +-10us
 performance = 14147/29537
 % +-5us(8.328-8.338ms)
-c_5us = 0;
-for i = 1:(length(period))
-    if (period(i) >= 8.328e-3) && (period(i)<=8.338e-3)
-        c_5us = c_5us +1;
-    end
-end
-
-performance_5us = c_5us/length(period)
-
-% +-3us(8.330-8.336ms)
-c_3us = 0;
-for i = 1:(length(period))
-    if (period(i) >= 8.330e-3) && (period(i)<=8.336e-3)
-        c_3us = c_3us +1;
-    end
-end
-
-performance_3us = c_3us/length(period)
+range = [8.328e-3,8.338e-3];
+c_opt_5us = count_within_range(period_optical, range);  % 可直接统计符合范围的值
+c_read_5us = count_within_range(period_sync_read, range);  % 可直接统计符合范围的值
+performance_opt_5us = c_opt_5us/length(period_optical);
+performance_read_5us = c_opt_5us/length(period_sync_read);
+% 
+% c_5us = 0;
+% for i = 1:(length(period))
+%     if (period(i) >= 8.328e-3) && (period(i)<=8.338e-3)
+%         c_5us = c_5us +1;
+%     end
+% end
+% 
+% performance_5us = c_5us/length(period)
+% 
+% % +-3us(8.330-8.336ms)
+% c_3us = 0;
+% for i = 1:(length(period))
+%     if (period(i) >= 8.330e-3) && (period(i)<=8.336e-3)
+%         c_3us = c_3us +1;
+%     end
+% end
+% 
+% performance_3us = c_3us/length(period)
 
 %% plot figure 原始周期图
 % figure(1)
@@ -373,3 +330,71 @@ h2.LineWidth = 1;
 % 这是对前文起效？
 set(gca,'FontName','Times New Roman','FontSize',24,'linewidth',1.5, ...
     'XMinorGrid','on','YMinorGrid','on','box','on');
+%% 
+
+
+function duration = calculate_high_level_duration(signaldata, timeframe, threshold)
+    % calculate_high_level_duration: 计算信号高电平的持续时间
+    % 输入参数：
+    %   - signaldata: 信号数据 (列向量)
+    %   - timeframe: 时间戳数据 (列向量)
+    %   - threshold: 时间间隔的最小阈值（用于剔除短暂的高电平）
+    %
+    % 输出参数：
+    %   - duration: Nx2 矩阵，每行包含 [高电平持续时间, 起始时间]
+
+    % 计算信号的差分，检测上升沿和下降沿
+    signal_diff = diff(signaldata);
+
+    % 找到上升沿和下降沿的索引（+1 修正为原始信号的时刻）
+    rising_edges = find(signal_diff == 1) + 1;   % 上升沿（从 0 到 1）
+    falling_edges = find(signal_diff == -1) + 1; % 下降沿（从 1 到 0）
+
+    % 确保每个上升沿都有对应的下降沿（避免未闭合的高电平）
+    num_edges = min(length(rising_edges), length(falling_edges));
+    rising_edges = rising_edges(1:num_edges);
+    falling_edges = falling_edges(1:num_edges);
+
+    % 计算高电平持续时间
+    high_durations = timeframe(falling_edges) - timeframe(rising_edges);
+
+    % 筛选高电平持续时间大于阈值的记录
+    valid_indices = find(high_durations > threshold);
+
+    % 输出结果矩阵：每行是 [高电平持续时间, 起始时间]
+    duration = [high_durations(valid_indices), timeframe(rising_edges(valid_indices))];
+end
+
+function [period, c_good] = calculate_period_vectorized(duration, threshold, range)
+    % calculate_period_vectorized: 矢量化计算波之间的时间间隔并统计满足条件的间隔个数
+    % 输入参数：
+    %   - duration: Nx2 矩阵，每行包含 [时间间隔, 起始时间] 信息
+    %   - threshold: 一个标量，筛选条件为时间间隔小于 threshold
+    %   - range: 1x2 向量，计数条件范围 [min, max]
+    %
+    % 输出参数：
+    %   - period: 存储满足条件的时间间隔数组
+    %   - c_good: 满足范围条件的时间间隔个数
+
+    % 计算相邻两波的时间间隔
+    period_temp = duration(2:end, 2) - duration(1:end-1, 2);
+
+    % 筛选时间间隔小于阈值的值
+    period = period_temp(period_temp < threshold);
+
+    % 统计满足范围条件的时间间隔个数
+    c_good = count_within_range(period, range);
+end
+
+function c_good = count_within_range(period, range)
+    % count_within_range: 统计时间间隔中符合范围的个数
+    % 输入参数：
+    %   - period: 1xN 数组，存储时间间隔
+    %   - range: 1x2 向量，计数条件范围 [min, max]
+    %
+    % 输出参数：
+    %   - c_good: 满足范围条件的时间间隔个数
+
+    % 使用逻辑索引统计符合范围的个数
+    c_good = sum(period >= range(1) & period <= range(2));
+end
