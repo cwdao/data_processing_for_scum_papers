@@ -5,6 +5,8 @@ clear;
 % the demo paper data
 % raw_data = readtable("digital_synccheck.csv");
 % the journal paper data
+
+% https://hkustgz-my.sharepoint.com/:x:/g/personal/cwang199_connect_hkust-gz_edu_cn/EQVVZgqEBYRImXM12cCwJ2YBOYxfVcBiJayqquoesH6F6g?e=QqKJKs
 raw_data = readtable("new_counter_read_acc_check_5min.csv");
 %% 加载变量
 % 时间戳
@@ -24,27 +26,27 @@ t11 = t1*10.0000^6
 % the answer is 6.35e-5,if *10^6,it will be us.I think it is enough to
 % caculate the duration
 %% test
-threshold = 3e-5;
-    % 计算信号的差分，检测上升沿和下降沿
-    signal_diff = diff(signaldata_optical);
-
-    % 找到上升沿和下降沿的索引
-    rising_edges = find(signal_diff == 1);   % 上升沿（从 0 到 1）
-    falling_edges = find(signal_diff == -1); % 下降沿（从 1 到 0）
-
-    % 确保每个上升沿都有对应的下降沿（避免未闭合的高电平）
-    num_edges = min(length(rising_edges), length(falling_edges));
-    rising_edges = rising_edges(1:num_edges);
-    falling_edges = falling_edges(1:num_edges);
-
-    % 计算高电平持续时间
-    high_durations = timeframe(falling_edges) - timeframe(rising_edges);
-
-    % 筛选高电平持续时间大于阈值的记录
-    valid_indices = find(high_durations > threshold);
-
-    % 输出结果矩阵：每行是 [高电平持续时间, 起始时间]
-    duration = [high_durations(valid_indices), timeframe(rising_edges(valid_indices))];
+% threshold = 3e-5;
+%     % 计算信号的差分，检测上升沿和下降沿
+%     signal_diff = diff(signaldata_optical);
+%
+%     % 找到上升沿和下降沿的索引
+%     rising_edges = find(signal_diff == 1);   % 上升沿（从 0 到 1）
+%     falling_edges = find(signal_diff == -1); % 下降沿（从 1 到 0）
+%
+%     % 确保每个上升沿都有对应的下降沿（避免未闭合的高电平）
+%     num_edges = min(length(rising_edges), length(falling_edges));
+%     rising_edges = rising_edges(1:num_edges);
+%     falling_edges = falling_edges(1:num_edges);
+%
+%     % 计算高电平持续时间
+%     high_durations = timeframe(falling_edges) - timeframe(rising_edges);
+%
+%     % 筛选高电平持续时间大于阈值的记录
+%     valid_indices = find(high_durations > threshold);
+%
+%     % 输出结果矩阵：每行是 [高电平持续时间, 起始时间]
+%     duration = [high_durations(valid_indices), timeframe(rising_edges(valid_indices))];
 %% 计算光的持续时间
 % TS4231的Epin以低电平表示根据存储的格式，0表示信号现在开始为0，1表示开始为1.因此只需计算所有0和其紧跟 的1的时间间隔，就能得到所有波的时间。再删除所有小于30us(3e-5
 % s)，就得到所有同步 光的时间。
@@ -103,16 +105,16 @@ c_opt_5us = count_within_range(period_optical, range);  % 可直接统计符合�
 c_read_5us = count_within_range(period_sync_read, range);  % 可直接统计符合范围的值
 performance_opt_5us = c_opt_5us/length(period_optical);
 performance_read_5us = c_opt_5us/length(period_sync_read);
-% 
+%
 % c_5us = 0;
 % for i = 1:(length(period))
 %     if (period(i) >= 8.328e-3) && (period(i)<=8.338e-3)
 %         c_5us = c_5us +1;
 %     end
 % end
-% 
+%
 % performance_5us = c_5us/length(period)
-% 
+%
 % % +-3us(8.330-8.336ms)
 % c_3us = 0;
 % for i = 1:(length(period))
@@ -120,7 +122,7 @@ performance_read_5us = c_opt_5us/length(period_sync_read);
 %         c_3us = c_3us +1;
 %     end
 % end
-% 
+%
 % performance_3us = c_3us/length(period)
 
 %% plot figure 原始周期图
@@ -330,71 +332,71 @@ h2.LineWidth = 1;
 % 这是对前文起效？
 set(gca,'FontName','Times New Roman','FontSize',24,'linewidth',1.5, ...
     'XMinorGrid','on','YMinorGrid','on','box','on');
-%% 
+%%
 
 
 function duration = calculate_high_level_duration(signaldata, timeframe, threshold)
-    % calculate_high_level_duration: 计算信号高电平的持续时间
-    % 输入参数：
-    %   - signaldata: 信号数据 (列向量)
-    %   - timeframe: 时间戳数据 (列向量)
-    %   - threshold: 时间间隔的最小阈值（用于剔除短暂的高电平）
-    %
-    % 输出参数：
-    %   - duration: Nx2 矩阵，每行包含 [高电平持续时间, 起始时间]
+% calculate_high_level_duration: 计算信号高电平的持续时间
+% 输入参数：
+%   - signaldata: 信号数据 (列向量)
+%   - timeframe: 时间戳数据 (列向量)
+%   - threshold: 时间间隔的最小阈值（用于剔除短暂的高电平）
+%
+% 输出参数：
+%   - duration: Nx2 矩阵，每行包含 [高电平持续时间, 起始时间]
 
-    % 计算信号的差分，检测上升沿和下降沿
-    signal_diff = diff(signaldata);
+% 计算信号的差分，检测上升沿和下降沿
+signal_diff = diff(signaldata);
 
-    % 找到上升沿和下降沿的索引（+1 修正为原始信号的时刻）
-    rising_edges = find(signal_diff == 1) + 1;   % 上升沿（从 0 到 1）
-    falling_edges = find(signal_diff == -1) + 1; % 下降沿（从 1 到 0）
+% 找到上升沿和下降沿的索引（+1 修正为原始信号的时刻）
+rising_edges = find(signal_diff == 1) + 1;   % 上升沿（从 0 到 1）
+falling_edges = find(signal_diff == -1) + 1; % 下降沿（从 1 到 0）
 
-    % 确保每个上升沿都有对应的下降沿（避免未闭合的高电平）
-    num_edges = min(length(rising_edges), length(falling_edges));
-    rising_edges = rising_edges(1:num_edges);
-    falling_edges = falling_edges(1:num_edges);
+% 确保每个上升沿都有对应的下降沿（避免未闭合的高电平）
+num_edges = min(length(rising_edges), length(falling_edges));
+rising_edges = rising_edges(1:num_edges);
+falling_edges = falling_edges(1:num_edges);
 
-    % 计算高电平持续时间
-    high_durations = timeframe(falling_edges) - timeframe(rising_edges);
+% 计算高电平持续时间
+high_durations = timeframe(falling_edges) - timeframe(rising_edges);
 
-    % 筛选高电平持续时间大于阈值的记录
-    valid_indices = find(high_durations > threshold);
+% 筛选高电平持续时间大于阈值的记录
+valid_indices = find(high_durations > threshold);
 
-    % 输出结果矩阵：每行是 [高电平持续时间, 起始时间]
-    duration = [high_durations(valid_indices), timeframe(rising_edges(valid_indices))];
+% 输出结果矩阵：每行是 [高电平持续时间, 起始时间]
+duration = [high_durations(valid_indices), timeframe(rising_edges(valid_indices))];
 end
 
 function [period, c_good] = calculate_period_vectorized(duration, threshold, range)
-    % calculate_period_vectorized: 矢量化计算波之间的时间间隔并统计满足条件的间隔个数
-    % 输入参数：
-    %   - duration: Nx2 矩阵，每行包含 [时间间隔, 起始时间] 信息
-    %   - threshold: 一个标量，筛选条件为时间间隔小于 threshold
-    %   - range: 1x2 向量，计数条件范围 [min, max]
-    %
-    % 输出参数：
-    %   - period: 存储满足条件的时间间隔数组
-    %   - c_good: 满足范围条件的时间间隔个数
+% calculate_period_vectorized: 矢量化计算波之间的时间间隔并统计满足条件的间隔个数
+% 输入参数：
+%   - duration: Nx2 矩阵，每行包含 [时间间隔, 起始时间] 信息
+%   - threshold: 一个标量，筛选条件为时间间隔小于 threshold
+%   - range: 1x2 向量，计数条件范围 [min, max]
+%
+% 输出参数：
+%   - period: 存储满足条件的时间间隔数组
+%   - c_good: 满足范围条件的时间间隔个数
 
-    % 计算相邻两波的时间间隔
-    period_temp = duration(2:end, 2) - duration(1:end-1, 2);
+% 计算相邻两波的时间间隔
+period_temp = duration(2:end, 2) - duration(1:end-1, 2);
 
-    % 筛选时间间隔小于阈值的值
-    period = period_temp(period_temp < threshold);
+% 筛选时间间隔小于阈值的值
+period = period_temp(period_temp < threshold);
 
-    % 统计满足范围条件的时间间隔个数
-    c_good = count_within_range(period, range);
+% 统计满足范围条件的时间间隔个数
+c_good = count_within_range(period, range);
 end
 
 function c_good = count_within_range(period, range)
-    % count_within_range: 统计时间间隔中符合范围的个数
-    % 输入参数：
-    %   - period: 1xN 数组，存储时间间隔
-    %   - range: 1x2 向量，计数条件范围 [min, max]
-    %
-    % 输出参数：
-    %   - c_good: 满足范围条件的时间间隔个数
+% count_within_range: 统计时间间隔中符合范围的个数
+% 输入参数：
+%   - period: 1xN 数组，存储时间间隔
+%   - range: 1x2 向量，计数条件范围 [min, max]
+%
+% 输出参数：
+%   - c_good: 满足范围条件的时间间隔个数
 
-    % 使用逻辑索引统计符合范围的个数
-    c_good = sum(period >= range(1) & period <= range(2));
+% 使用逻辑索引统计符合范围的个数
+c_good = sum(period >= range(1) & period <= range(2));
 end
