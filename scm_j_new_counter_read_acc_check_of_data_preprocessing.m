@@ -94,239 +94,143 @@ range = [0.008323, 0.008343];  % 计数范围
 [period_optical, c_good_optical] = calculate_period_vectorized(duration_optical, threshold, range);
 % while读出来的
 [period_sync_read, c_good_sync_read] = calculate_period_vectorized(duration_sync_read, threshold, range);
-
-
-%%
+%% 计算各ppm值
 % +-10us
 performance = 14147/29537
 % +-5us(8.328-8.338ms)
-range = [8.328e-3,8.338e-3];
+mean_period = mean(period_optical);
+theoretical_period = 1/120;
+range = [0.008328, 0.008338];  % 计数范围
 c_opt_5us = count_within_range(period_optical, range);  % 可直接统计符合范围的值
 c_read_5us = count_within_range(period_sync_read, range);  % 可直接统计符合范围的值
 performance_opt_5us = c_opt_5us/length(period_optical);
-performance_read_5us = c_opt_5us/length(period_sync_read);
-%
-% c_5us = 0;
-% for i = 1:(length(period))
-%     if (period(i) >= 8.328e-3) && (period(i)<=8.338e-3)
-%         c_5us = c_5us +1;
-%     end
-% end
-%
-% performance_5us = c_5us/length(period)
-%
-% % +-3us(8.330-8.336ms)
-% c_3us = 0;
-% for i = 1:(length(period))
-%     if (period(i) >= 8.330e-3) && (period(i)<=8.336e-3)
-%         c_3us = c_3us +1;
-%     end
-% end
-%
-% performance_3us = c_3us/length(period)
+performance_read_5us = c_read_5us/length(period_sync_read);
+% 计算 40ppm的范围,+3.33e-7s, 也就是0.33 us
+range = [theoretical_period-3.33e-7, theoretical_period+3.33e-7];  % 计数范围
+c_opt_40ppm = count_within_range(period_optical, range);  % 可直接统计符合范围的值
+c_read_40ppm = count_within_range(period_sync_read, range);  % 可直接统计符合范围的值
+performance_opt_40ppm = c_opt_40ppm/length(period_optical);
+performance_read_40ppm = c_read_40ppm/length(period_sync_read);
 
 %% plot figure 原始周期图
 % figure(1)
 % set(gca,'FontName','Times New Roman','FontSize',24,'linewidth',1.5, ...
 %     'XMinorGrid','off','YMinorGrid','off','box','off');
 figure(101)
+% subplot(1,2,1)
 ylabel('Counts');
-xlabel('Sync light periods (ms)');
+xlabel('Sync light periods read by SCUM optical receiver (ms)');
 hold on
 % 放大坐标到ms
-period_show = period * 1000;
+period_show = period_optical * 1000;
 h101 = histogram(period_show);
 h101.EdgeColor = "black";
 h101.FaceColor = "#e89776";
 h101.LineWidth = 1;
 set(gca,'FontName','Times New Roman','FontSize',24,'linewidth',1.5, ...
     'XMinorGrid','on','YMinorGrid','on','box','on');
-% 计算 40ppm的范围,+3.33e-7s, 也就是0.33 us
-origin_40ppm = 0;
-% origin_40ppm_mean = mean(period);
-for i = 1:(length(period))
-    if (period(i) >= mean(period)-3.333e-7) && (period(i)<=mean(period)+3.333e-7)
-        origin_40ppm = origin_40ppm +1;
-    end
-end
 
-performance_40ppm_origin = origin_40ppm/length(period);
-
-
-
-
-% figure(1)
-% set(gca,'FontName','Times New Roman','FontSize',24);
-% % ylabel('字体设置为宋体','FontName','宋体','FontSize',24);
-% hold on
-% figure(1)
-% % plot([0.00833;0.00834], [1;1]*50, '-k', 'LineWidth',1); % 显著性的那条直线
-% % plot(histogram(period))
-% figure(1)
-% hold on
-% hist = histogram(period);
-% hist.EdgeColor = "black";
-% hist.FaceColor = "#e89776";
-% hist.LineWidth = 1;
-
-
-% box off;
-%
-% % find the start poiont of line 5us
-% h_edge = hist.BinEdges;
-% h_count = hist.BinCounts;
-% line1_count_start = 15;
-% line1_count_end = 15 + 10;
-% line1_y_max = max(h_count)+50;
-% xs1 = h_edge(line1_count_start);
-% xe1 = h_edge(line1_count_end);
-% plot([xs1;xe1], [1;1]*line1_y_max, '-k', 'LineWidth',1); % 显著性的那条直线
-% plot([1;1]*xs1, [(h_count(line1_count_start)+ 100), line1_y_max*1], '-k', 'LineWidth', 1); % 显著性的那条直线的左方下直线
-% plot([1;1]*xe1, [(h_count(line1_count_end)+ 100), line1_y_max*1], '-k', 'LineWidth', 1); % 显著性的那条直线的左方下直线
-% % set(gca,'FontName','Times New Roman','FontSize',24);
-% txt1 = {'\pm 5 us: 95.06 %',''};
-%
-% t1 = text(mean([xs1,xe1]),line1_y_max,txt1)
-% t1.FontSize = 24;
-% t1.FontName = 'Times New Roman';
-%
-% % find the start poiont of line 10us
-% h_edge = hist.BinEdges;
-% h_count = hist.BinCounts;
-% line2_count_start = 10;
-% line2_count_end = 10 + 20;
-% line2_y_max = max(h_count)+90;
-% xs2 = h_edge(line2_count_start);
-% xe2 = h_edge(line2_count_end);
-% plot([xs2;xe2], [1;1]*line2_y_max, '-k', 'LineWidth',1); % 显著性的那条直线
-% plot([1;1]*xs2, [(h_count(line2_count_start)+ 100), line2_y_max*1], '-k', 'LineWidth', 1); % 显著性的那条直线的左方下直线
-% plot([1;1]*xe2, [(h_count(line2_count_end)+ 100), line2_y_max*1], '-k', 'LineWidth', 1); % 显著性的那条直线的左方下直线
-% % set(gca,'FontName','Times New Roman','FontSize',24);
-% txt2 = {'\pm 10 us: 98.70 %',''};
-%
-% t2 = text(mean([xs2,xe2]),line2_y_max,txt2)
-% t2.FontSize = 24;
-% t2.FontName = 'Times New Roman';
-%
-% % find the start poiont of line 3us
-% h_edge = hist.BinEdges;
-% h_count = hist.BinCounts;
-% line3_count_start = 17;
-% line3_count_end = 17 + 6;
-% line3_y_max = max(h_count)+10;
-% xs3 = h_edge(line3_count_start);
-% xe3 = h_edge(line3_count_end);
-% plot([xs3;xe3], [1;1]*line3_y_max, '-k', 'LineWidth',1); % 显著性的那条直线
-% plot([1;1]*xs3, [(h_count(line3_count_start)+ 100), line3_y_max*1], '-k', 'LineWidth', 1); % 显著性的那条直线的左方下直线
-% plot([1;1]*xe3, [(h_count(line3_count_end)+ 100), line3_y_max*1], '-k', 'LineWidth', 1); % 显著性的那条直线的左方下直线
-% % set(gca,'FontName','Times New Roman','FontSize',24);
-% txt3 = {'\pm 3 us: 82.57 %',''};
-%
-% t3 = text(mean([xs3,xe3]),line3_y_max,txt3)
-% t3.FontSize = 24;
-% t3.FontName = 'Times New Roman';
-%
-% ylabel('Counts');
-% xlabel('Sync light period (ms)');
-% set(gca,'linewidth',1.5);
-% plot([1;1]*x(2), [y*1.05, y*1.1], '-k', 'LineWidth', 1); % 显著性的那条直线的右方下直线
-
-%%
-mean_data = mean(period);
-var_data = var(period);
-% sigline()
-
-pd = fitdist(transpose(period),'Normal')
-% y_pdf = normpdf(period,pd.mu,pd.sigma);
-% 考虑绘制拟合分布，但APP里就有分布拟合
-% x = [8.13e-3,.01e-3,8.53e-3];
-% y_pdf = normpdf(x,pd.mu,pd.sigma);
-% plot(x,y_pdf)
-%%
-% 考虑绘制体现误差的Y轴的图
-% figure(2)
-period_diff = period - pd.mu;
-% plot(period_diff);
-period_diff_us = period_diff * 120.;
+% 由IO读取的原始周期
+figure(102)
+% subplot(1,2,2)
+ylabel('Counts');
+xlabel('Sync light periods read by SCUM IO (ms)');
+hold on
+% 放大坐标到ms
+period_show_read = period_sync_read * 1000;
+h102 = histogram(period_show_read);
+h102.EdgeColor = "black";
+h102.FaceColor = "#e89776";
+h102.LineWidth = 1;
+set(gca,'FontName','Times New Roman','FontSize',24,'linewidth',1.5, ...
+    'XMinorGrid','on','YMinorGrid','on','box','on');
 %%  累计误差会如何？
 cumu_timewin = 12;
 cumu_timestep = 1;
+% 首先是optical receiver的累计误差
 j = 1;
-for i = 1:cumu_timestep:length(period)-cumu_timewin
-    cumu_t1(j) = mean(period(i:i+cumu_timewin));
+for i = 1:cumu_timestep:length(period_optical)-cumu_timewin
+    cumu_t1(j) = mean(period_optical(i:i+cumu_timewin));
     j = j + 1;
 end
-% figure(1)
 
-figure(1)
+figure(201)
 ylabel('Counts');
-xlabel('Average of 12 sync light periods (ms)');
+xlabel('Average of 12 sync light periods read by SCUM optical receiver (ms)');
 hold on
 % 放大坐标到ms
-cumu_t1_show = cumu_t1 * 1000.
-h2 = histogram(cumu_t1_show);
-h2.EdgeColor = "black";
-h2.FaceColor = "#e89776";
-h2.LineWidth = 1;
+cumu_t1_show = cumu_t1 * 1000;
+h201 = histogram(cumu_t1_show);
+h201.EdgeColor = "black";
+h201.FaceColor = "#e89776";
+h201.LineWidth = 1;
 set(gca,'FontName','Times New Roman','FontSize',24,'linewidth',1.5, ...
     'XMinorGrid','on','YMinorGrid','on','box','on');
 
 % 计算 40ppm的范围,+3.33e-7s, 也就是0.33 us
-cumu_40ppm = 0;
-cumu_40ppm_mean = mean(cumu_t1);
-for i = 1:(length(cumu_t1))
-    if (cumu_t1(i) >= mean(cumu_t1)-3.333e-7) && (cumu_t1(i)<=mean(cumu_t1)+3.333e-7)
-        cumu_40ppm = cumu_40ppm +1;
-    end
+range = [theoretical_period-3.33e-7, theoretical_period+3.33e-7];  % 计数范围
+cu_opt_40ppm = count_within_range(cumu_t1, range);  % 可直接统计符合范围的值
+performance_cu_opt_40ppm = cu_opt_40ppm/length(period_optical);
+
+%% 再看看IO读到的累计误差
+cumu_timewin = 12;
+cumu_timestep = 1;
+j = 1;
+for i = 1:cumu_timestep:length(period_sync_read)-cumu_timewin
+    cumu_t2(j) = mean(period_sync_read(i:i+cumu_timewin));
+    j = j + 1;
 end
 
-performance_40ppm = cumu_40ppm/length(cumu_t1)
-
-% 换一个时间窗
-% cumu_timewin = 20;
-% % cumu_timestep = 1;
-% j = 1;
-% for i = 1:cumu_timestep:length(period)-cumu_timewin
-%     cumu_t2(j) = mean(period(i:i+cumu_timewin));
-%     j = j + 1;
-% end
-% hold on
-% figure(1)
-% h3 = histogram(cumu_t2);
-% set(gca, 'XMinorGrid','on');
-% set(gca, 'YMinorGrid','on');
-% legend( 'single period', 'average of 10 periods', 'average of 20 periods');
-%% 绘制sync cal period 图
-% figure(3)
-
-figure(3)
+figure(202)
 ylabel('Counts');
-xlabel('sync light calibration periods (ms)');
+xlabel('Average of 12 sync light periods read by SCUM IO (ms)');
 hold on
 % 放大坐标到ms
-period_sync_cal_show = period_sync_cal * 1000.
-h5 = histogram(period_sync_cal_show);
-h5.EdgeColor = "black";
-h5.FaceColor = "0.93,0.69,0.13";
-h5.LineWidth = 1;
+cumu_t2_show = cumu_t2 * 1000;
+h202 = histogram(cumu_t2_show);
+h202.EdgeColor = "black";
+h202.FaceColor = "#e89776";
+h202.LineWidth = 1;
 set(gca,'FontName','Times New Roman','FontSize',24,'linewidth',1.5, ...
     'XMinorGrid','on','YMinorGrid','on','box','on');
 
-%% 绘制周期波动图
+% 计算 40ppm的范围,+3.33e-7s, 也就是0.33 us
+range = [theoretical_period-3.33e-7, theoretical_period+3.33e-7];  % 计数范围
+cu_read_40ppm = count_within_range(cumu_t2, range);  % 可直接统计符合范围的值
+performance_cu_read_40ppm = cu_read_40ppm/length(period_sync_read);
+
+
+%% 绘制sync cal period 图
+% figure(3)
+
+% figure(3)
+% ylabel('Counts');
+% xlabel('sync light calibration periods (ms)');
+% hold on
+% % 放大坐标到ms
+% period_sync_cal_show = period_sync_cal * 1000.
+% h5 = histogram(period_sync_cal_show);
+% h5.EdgeColor = "black";
+% h5.FaceColor = "0.93,0.69,0.13";
+% h5.LineWidth = 1;
+% set(gca,'FontName','Times New Roman','FontSize',24,'linewidth',1.5, ...
+%     'XMinorGrid','on','YMinorGrid','on','box','on');
+
+%% 绘制周期波动图(read)
 
 % figure(2)
 % set(gca,'FontName','Times New Roman','FontSize',24,'linewidth',1.5, ...
 %     'XMinorGrid','on','YMinorGrid','on','box','on');
-figure(2)
+figure(301)
 ylabel('Duration (ms)');
 xlabel('Periods');
 hold on
 % 放大坐标到ms
-period_show = period * 1000.
-h2 = plot(period_show);
+period_show = period_sync_read * 1000.
+h301 = plot(period_show);
 % h2.EdgeColor = "black";
 % h2.FaceColor = "#e89776";
-h2.LineWidth = 1;
+h301.LineWidth = 1;
 % set(gca,'FontName','Times New Roman','FontSize',24,'linewidth',1.5, ...
 %     'XMinorGrid','off','YMinorGrid','off','box','off');
 % 这是对前文起效？
