@@ -233,8 +233,13 @@ theoretical_value = 1000/120; % 理论周期值 (ms)
 ppm_range = 40; % ppm 范围
 delta = theoretical_value * ppm_range / 1e6; % 计算误差范围
 
+% 手动设置子图位置
+subplot1_position = [0.1, 0.1, 0.35, 0.5]; % 左侧子图的位置 [x, y, width, height]
+subplot2_position = [0.55, 0.1, 0.35, 0.5]; % 右侧子图的位置 [x, y, width, height]
+
 % 子图 1: 硬件采集信号
 subplot(1, 2, 1); % 创建第一个子图
+set(gca, 'Position', subplot1_position); % 设置子图的位置
 h1 = histogram(period_show_hw, 'Normalization', 'pdf');
 h1.EdgeColor = "black";
 h1.FaceColor = "#e89776";
@@ -300,6 +305,7 @@ grid on
 
 % 子图 2: 软件读取信号
 subplot(1, 2, 2); % 创建第二个子图
+set(gca, 'Position', subplot2_position); % 设置子图的位置
 h2 = histogram(period_show_sw, 'Normalization', 'pdf');
 h2.EdgeColor = "black";
 h2.FaceColor = "#76a6e8"; % 不同颜色
@@ -429,6 +435,9 @@ performance_cu_read_40ppm = cu_read_40ppm/length(period_sync_read);
 figure(2001);
 set(gcf, 'Units', 'pixels', 'Position', [100, 100, 1200, 675]); % 设置图像比例为 16:9
 
+% 手动设置子图位置
+subplot1_position = [0.1, 0.1, 0.35, 0.5]; % 左侧子图的位置 [x, y, width, height]
+subplot2_position = [0.55, 0.1, 0.35, 0.5]; % 右侧子图的位置 [x, y, width, height]
 % 第一组数据（硬件采集信号）
 period_show_hw = cumu_t1' * 1000; % 转换为 ms
 
@@ -442,6 +451,7 @@ delta = theoretical_value * ppm_range / 1e6; % 计算误差范围
 
 % 子图 1: 硬件采集信号
 subplot(1, 2, 1); % 创建第一个子图
+set(gca, 'Position', subplot1_position); % 设置子图的位置
 h1 = histogram(period_show_hw, 'Normalization', 'pdf');
 h1.EdgeColor = "black";
 h1.FaceColor = "#e89776";
@@ -511,6 +521,7 @@ grid on
 
 % 子图 2: 软件读取信号
 subplot(1, 2, 2); % 创建第二个子图
+set(gca, 'Position', subplot2_position); % 设置子图的位置
 h2 = histogram(period_show_sw, 'Normalization', 'pdf');
 h2.EdgeColor = "black";
 h2.FaceColor = "#76a6e8"; % 不同颜色
