@@ -363,8 +363,8 @@ t6 = text(8.335, max(f) * 0.5, ['Within 40 ppm = ', num2str(in_range, '%.2f'), '
 xlabel('Sync light periods read by SCUM IO (ms)', 'FontSize', 14, 'FontName', 'Arial');
 ylabel('Counts', 'FontSize', 14, 'FontName', 'Arial');
 title('Software Processed Signal', 'FontSize', 18, 'FontName', 'Arial');
-legend('Histogram', 'KDE Curve', 'Gaussian Fit', 'Theoretical Value', '40 ppm Range', ...
-    'FontSize', 10, 'FontName', 'Arial', 'Location', 'NorthWest');
+legend('Histogram', 'KDE Curve', 'Gaussian Fit', 'Theoretical Value', ...
+    '-40 ppm', '+40 ppm', '40 ppm Range', 'Location', 'NorthWest', 'FontSize', 10, 'FontName', 'Arial', 'Box', 'off');
 grid on
 
 % 调整整体布局
@@ -469,8 +469,8 @@ y_fit = pdf(pd, x_fit);
 plot(x_fit, y_fit, 'b--', 'LineWidth', 2, 'DisplayName', ...
     ['Gaussian Fit (\mu=', num2str(pd.mu, '%.4f'), ', \sigma=', num2str(pd.sigma, '%.4f'), ')']);
 
-% % 理论值标注
-% xline(theoretical_value, 'r-', 'LineWidth', 2, 'DisplayName', 'Theoretical Value');
+% 理论值标注
+xline(theoretical_value, 'r-', 'LineWidth', 2, 'DisplayName', 'Theoretical Value');
 % text(theoretical_value + 0.0001, max(f) * 0.9, 'Theoretical Value', 'FontSize', 18, 'Color', 'red', ...
 %     'HorizontalAlignment', 'left', 'BackgroundColor', 'white', 'EdgeColor', 'none');
 
@@ -488,6 +488,8 @@ fill([theoretical_value - delta, theoretical_value + delta, theoretical_value + 
 in_range = sum((period_show_hw >= (theoretical_value - delta)) & (period_show_hw <= (theoretical_value + delta))) / length(period_show_hw) * 100;
 
 % 创建文字对象
+t11 = text(theoretical_value + 0.0001, max(f) * 0.9, 'Theoretical Value', 'FontSize', 18, 'Color', 'red', ...
+    'HorizontalAlignment', 'left', 'BackgroundColor', 'white', 'EdgeColor', 'none');
 t1 = text(8.3334, max(f) * 0.7, ['\mu = ', num2str(pd.mu, '%.4f')], ...
     'FontSize', 18, 'Color', 'blue', 'HorizontalAlignment', 'left', ...
     'BackgroundColor', 'white', 'EdgeColor', 'none');
@@ -499,9 +501,9 @@ t3 = text(8.3334, max(f) * 0.5, ['Within 40 ppm = ', num2str(in_range, '%.2f'), 
     'BackgroundColor', 'white', 'EdgeColor', 'none');
 
 % 理论值标注
-xline(theoretical_value, 'r-', 'LineWidth', 2, 'DisplayName', 'Theoretical Value');
-text(theoretical_value + 0.0001, max(f) * 0.9, 'Theoretical Value', 'FontSize', 18, 'Color', 'red', ...
-    'HorizontalAlignment', 'left', 'BackgroundColor', 'white', 'EdgeColor', 'none');
+% xline(theoretical_value, 'r-', 'LineWidth', 2, 'DisplayName', 'Theoretical Value');
+% text(theoretical_value + 0.0001, max(f) * 0.9, 'Theoretical Value', 'FontSize', 18, 'Color', 'red', ...
+%     'HorizontalAlignment', 'left', 'BackgroundColor', 'white', 'EdgeColor', 'none');
 
 % 设置标题和坐标轴标签
 xlabel('Sync light periods read by SCUM optical receiver (ms)', 'FontSize', 14, 'FontName', 'Arial');
@@ -539,8 +541,8 @@ y_fit = pdf(pd, x_fit);
 plot(x_fit, y_fit, 'b--', 'LineWidth', 2, 'DisplayName', ...
     ['Gaussian Fit (\mu=', num2str(pd.mu, '%.4f'), ', \sigma=', num2str(pd.sigma, '%.4f'), ')']);
 
-% % 理论值标注
-% xline(theoretical_value, 'r-', 'LineWidth', 2, 'DisplayName', 'Theoretical Value');
+% 理论值标注
+xline(theoretical_value, 'r-', 'LineWidth', 2, 'DisplayName', 'Theoretical Value');
 % text(theoretical_value + 0.0001, max(f) * 0.9, 'Theoretical Value', 'FontSize', 18, 'Color', 'red', ...
 %     'HorizontalAlignment', 'left', 'BackgroundColor', 'white', 'EdgeColor', 'none');
 
@@ -558,8 +560,8 @@ fill([theoretical_value - delta, theoretical_value + delta, theoretical_value + 
 in_range = sum((period_show_sw >= (theoretical_value - delta)) & (period_show_sw <= (theoretical_value + delta))) / length(period_show_sw) * 100;
 
 % 理论值标注
-xline(theoretical_value, 'r-', 'LineWidth', 2, 'DisplayName', 'Theoretical Value');
-text(theoretical_value + 0.0001, max(f) * 0.9, 'Theoretical Value', 'FontSize', 18, 'Color', 'red', ...
+% xline(theoretical_value, 'r-', 'LineWidth', 2, 'DisplayName', 'Theoretical Value');
+t41 = text(theoretical_value + 0.0001, max(f) * 0.9, 'Theoretical Value', 'FontSize', 18, 'Color', 'red', ...
     'HorizontalAlignment', 'left', 'BackgroundColor', 'white', 'EdgeColor', 'none');
 
 % 创建文字对象
@@ -574,7 +576,7 @@ t6 = text(8.3335, max(f) * 0.5, ['Within 40 ppm = ', num2str(in_range, '%.2f'), 
     'BackgroundColor', 'white', 'EdgeColor', 'none');
 
 % % 使用 uistack 将文字对象提升到最上层
-% uistack(t1, 'top');
+uistack(t41, 'top');
 % uistack(t2, 'top');
 % uistack(t3, 'top');
 
@@ -582,8 +584,8 @@ t6 = text(8.3335, max(f) * 0.5, ['Within 40 ppm = ', num2str(in_range, '%.2f'), 
 xlabel('Sync light periods read by SCUM IO (ms)', 'FontSize', 14, 'FontName', 'Arial');
 ylabel('Counts', 'FontSize', 14, 'FontName', 'Arial');
 title('Software Processed Signal', 'FontSize', 18, 'FontName', 'Arial');
-legend('Histogram', 'KDE Curve', 'Gaussian Fit', 'Theoretical Value', '40 ppm Range', ...
-    'FontSize', 10, 'FontName', 'Arial', 'Location', 'NorthWest');
+legend('Histogram', 'KDE Curve', 'Gaussian Fit', 'Theoretical Value', ...
+    '-40 ppm', '+40 ppm', '40 ppm Range', 'Location', 'NorthWest', 'FontSize', 10, 'FontName', 'Arial', 'Box', 'off');
 grid on
 
 % 调整整体布局
