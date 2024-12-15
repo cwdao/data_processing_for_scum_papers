@@ -50,7 +50,7 @@ for i = 1:(length(duration(:,1))-1)
 end
 %%
 % +-10us
-performance = 1518/1538
+performance = 1518/1538;
 % +-5us(8.328-8.338ms)
 c_5us = 0;
 for i = 1:(length(period))
@@ -70,6 +70,16 @@ for i = 1:(length(period))
 end
 
 performance_3us = c_3us/length(period)
+
+% +-0.333us(8.330-8.336ms)
+c_40ppm = 0;
+mean_raw = mean(period);
+for i = 1:(length(period))
+    if (period(i) >= mean_raw-3.333e-7) && (period(i)<=mean_raw+3.333e-7)
+        c_40ppm = c_40ppm +1;
+    end
+end
+performance_raw_40ppm = c_40ppm/length(period)
 
 %% plot figure
 % figure(1)
