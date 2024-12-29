@@ -597,6 +597,43 @@ exportgraphics(gcf, 'Hardware_vs_Software_16_9.pdf', 'ContentType', 'vector');
 % 如果需要使用传统方法：
 % print(gcf, 'Hardware_vs_Software_16_9', '-dpdf', '-painters');
 
+%% 高斯分布的假设检验
+
+X = period_show_sw;
+muHat = mean(X);
+sigmaHat = std(X);
+xrange = linspace(min(X), max(X), 100);
+pdfNormal = normpdf(xrange, muHat, sigmaHat);
+% plot(xrange, pdfNormal, 'r-', 'LineWidth',2);
+% title('Histogram + Normal PDF');
+% xlabel('X');
+% ylabel('PDF');
+
+% 2) Kolmogorov-Smirnov (K-S) 检验
+%   H=0 表示“无法拒绝 X 来自正态分布的假设”
+%   H=1 表示“拒绝正态分布假设”
+alpha = 0.05;  % 显著性水平，可自己调整
+[H_ks,p_ks] = kstest((X - muHat)/sigmaHat, 'Alpha', alpha);
+fprintf('K-S test: H=%d, p=%.4f\n', H_ks, p_ks);
+
+% 3) Lilliefors 检验 (MATLAB 提供的 lillietest 函数)
+%   用于检测“已用样本均值和标准差估计参数”的正态性
+[H_lillie,p_lillie] = lillietest(X, 'Alpha', alpha);
+fprintf('Lilliefors test: H=%d, p=%.4f\n', H_lillie, p_lillie);
+
+% 4) χ² 拟合优度检验 (Chi-square goodness of fit)
+%   这里通过 fitdist 拟合一个正态分布，然后用 chi2gof 检测
+pd = fitdist(X,'Normal');
+[H_chi,p_chi] = chi2gof(X, 'cdf',{@normcdf, pd.mu, pd.sigma}, 'Alpha', alpha);
+fprintf('Chi-square test: H=%d, p=%.4f\n', H_chi, p_chi);
+
+% 5) 结论说明
+if H_ks==0 && H_lillie==0 && H_chi==0
+    disp('在显著性水平 alpha=0.05 下，所有检验都无法拒绝「X来自正态分布」假设。');
+else
+    disp('其中至少有一个检验拒绝了正态性，请查看具体 H_i、p_i 结果。');
+end
+
 
 %% 绘制sync cal period 图
 % figure(3)
@@ -624,7 +661,7 @@ ylabel('Duration (ms)');
 xlabel('Periods');
 hold on
 % 放大坐标到ms
-period_show = period_sync_read * 1000.
+period_show = period_sync_read * 1000.;
 h301 = plot(period_show);
 % h2.EdgeColor = "black";
 % h2.FaceColor = "#e89776";
