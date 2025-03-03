@@ -3,7 +3,7 @@ clc;
 clear;
 
 % load("data_2024-10-26_16-28_p2point.mat");
-load("data_2025-03-03_18-46.mat");
+load("data_2025-03-03_19-10.mat");
 % # 单位mm
 lighthouse_height = 543;
 % # 120Hz for sync light
@@ -14,7 +14,7 @@ lighthouse_angular_velocity = 2 * pi * lighthouse_freq;
 % # @10M,1s= 10,000,000 ticks
 resolution = 10000000; 
 %% 标签定义
-% 采集代码中只有0-9共10个标签，第一个点是右下校正点，标签9，第二个点是左上校正点，标签8，然后从1-9-1如此往复
+% 采集代码中只有0-9共10个标签，第一个点是左上校正点，标签8，第二个点是右下校正点，标签9，然后从1-9-1如此往复
 % 取点数据
 ax = data(:,1);
 ay = data(:,2);
@@ -77,8 +77,8 @@ x1 = point_calib_l(1,1); y1 = point_calib_l(1,2);
 x2 = point_calib_r(1,1); y2 = point_calib_r(1,2);
 
 % 目标坐标
-x1_prime = 100; y1_prime = 150;
-x2_prime = 250; y2_prime = 100;
+x1_prime = 100; y1_prime = 180;
+x2_prime = 180; y2_prime = 100;
 
 % 计算缩放因子
 s_x = (x2_prime - x1_prime) / (x2 - x1);
@@ -107,8 +107,8 @@ end
 figure;
 
 % 绘制第一个数组
-scatter(point_calibed_xy(:,1), point_calibed_xy(:,2), 'filled', 'MarkerFaceColor', [0.1, 0.5, 0.9], 'MarkerEdgeColor', 'none');
-hold on; % 保持当前图形
+% scatter(point_calibed_xy(:,1), point_calibed_xy(:,2), 'filled', 'MarkerFaceColor', [0.1, 0.5, 0.9], 'MarkerEdgeColor', 'none');
+% hold on; % 保持当前图形
 
 % 绘制第二个数组
 scatter(point_stable(:,1), point_stable(:,2), 'filled', 'MarkerFaceColor', [0.9, 0.3, 0.1], 'MarkerEdgeColor', 'none');

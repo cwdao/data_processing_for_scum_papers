@@ -3,8 +3,15 @@ clc;
 clear;
 
 %% 
+
+% 一般规则：0，休息或其他滤波滤掉的数据
+% 1：水平方向X移动
+% 2：垂直方向Y移动
+% 8：定位点1
+% 9：定位点2
+% q:停
 % 设置串口
-s = serialport('COM15', 38400, 'Timeout', 10); % 设置为COM18和波特率19200
+s = serialport('COM9', 38400, 'Timeout', 10); % 设置为COM9和波特率38400
 
 % 初始化数据存储
 data = [];
@@ -40,6 +47,7 @@ while toc < 1000 && ~stopFlag  % 持续10秒或直到手动停止
     
     % pause(0.1); % 暂停以避免过多占用CPU
 end
+%% 
 
 % 将数据转换为表格并设置列名
 dataTable = array2table(data, 'VariableNames', {'A_X', 'A_Y', 'B_X', 'B_Y', 'Label'});
@@ -49,6 +57,7 @@ disp(dataTable);
 
 % 关闭串口
 clear s;
+%% 
 
 % 获取当前日期和时间
 timestamp = datetime('now', 'Format', 'yyyy-MM-dd_HH-mm');
