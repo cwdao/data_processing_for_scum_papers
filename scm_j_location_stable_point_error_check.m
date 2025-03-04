@@ -92,7 +92,7 @@ t_y = y1_prime - s_y * y1;
 % transform_point = @(x, y) deal(s_x * x + t_x, s_y * y + t_y);
 point_calibed_xy(:,1) = point_xy(:,1)*s_x+t_x;
 point_calibed_xy(:,2) = point_xy(:,2)*s_y+t_y;
-%% 删除非静态点数据
+%% 提取各点并分类，滤波
 i = 1;
 j = 1;
 for i=1:length(point_label)
@@ -102,19 +102,53 @@ for i=1:length(point_label)
         j = j+1;
     end
 end
+
+% 添加坐标范围滤波，只保留X在(-100,350)和Y在(0,250)的点
+valid_indices = point_stable(:,1) >= -100 & point_stable(:,1) <= 350 & ...
+                point_stable(:,2) >= 0 & point_stable(:,2) <= 250;
+point_stable = point_stable(valid_indices, :);
+
+j = 1;
+for i=1:length(point_label)
+    if (point_label(i,1)==1)
+        point_stable_x1(j,1) = point_calibed_xy(i,1);
+        point_stable_x1(j,2) = point_calibed_xy(i,2);
+        j = j+1;
+    end
+end
+
+% 对point_stable_x1进行坐标范围滤波
+valid_indices = point_stable_x1(:,1) >= -100 & point_stable_x1(:,1) <= 350 & ...
+                point_stable_x1(:,2) >= 0 & point_stable_x1(:,2) <= 250;
+point_stable_x1 = point_stable_x1(valid_indices, :);
+
+j = 1;
+for i=1:length(point_label)
+    if (point_label(i,1)==2)
+        point_stable_y1(j,1) = point_calibed_xy(i,1);
+        point_stable_y1(j,2) = point_calibed_xy(i,2);
+        j = j+1;
+    end
+end
+
+% 对point_stable_y1进行坐标范围滤波
+valid_indices = point_stable_y1(:,1) >= -100 & point_stable_y1(:,1) <= 350 & ...
+                point_stable_y1(:,2) >= 0 & point_stable_y1(:,2) <= 250;
+point_stable_y1 = point_stable_y1(valid_indices, :);
+
 % scatter(point_calibed_xy(:,1),point_calibed_xy(:,2),point_stable(:,1),point_stable(:,2))
 % 创建图形窗口
 figure;
 
 % 绘制第一个数组
-% scatter(point_calibed_xy(:,1), point_calibed_xy(:,2), 'filled', 'MarkerFaceColor', [0.1, 0.5, 0.9], 'MarkerEdgeColor', 'none');
-% hold on; % 保持当前图形
+scatter(point_stable_x1(:,1), point_stable_x1(:,2), 'filled', 'MarkerFaceColor', [0.1, 0.5, 0.9], 'MarkerEdgeColor', 'none');
+hold on; % 保持当前图形
 
 % 绘制第二个数组
-scatter(point_stable(:,1), point_stable(:,2), 'filled', 'MarkerFaceColor', [0.9, 0.3, 0.1], 'MarkerEdgeColor', 'none');
+scatter(point_stable_y1(:,1), point_stable_y1(:,2), 'filled', 'MarkerFaceColor', [0.9, 0.3, 0.1], 'MarkerEdgeColor', 'none');
 
 % 添加图例
-legend('moving', 'stable');
+legend('x1', 'y1');
 axis equal
 % 添加标题和标签
 title('Scatter Plot of Two Arrays');
