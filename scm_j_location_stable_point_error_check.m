@@ -203,28 +203,33 @@ filtered_data_y2 = point_stable_y2(~outliers_y2x & ~outliers_y2y, :);
 % scatter(point_calibed_xy(:,1),point_calibed_xy(:,2),point_stable(:,1),point_stable(:,2))
 % 创建图形窗口
 figure;
-
-% 绘制第一个数组
-scatter(filtered_data_x1(:,1), filtered_data_x1(:,2), 'filled', 'MarkerFaceColor', [0.2, 0.6, 0.9], 'MarkerEdgeColor', 'none');
+% 合并四个数组为一个
+all_data = [filtered_data_x1; filtered_data_y1; filtered_data_x2; filtered_data_y2];
+% 绘制所有点
+figure;
+scatter(all_data(:,1), all_data(:,2), 'filled', 'MarkerFaceColor', [0.2, 0.6, 0.9], 'MarkerEdgeColor', 'none');
 hold on; % 保持当前图形
-
-% 绘制第二个数组
-scatter(filtered_data_y1(:,1), filtered_data_y1(:,2), 'filled', 'MarkerFaceColor', [0.9, 0.3, 0.2], 'MarkerEdgeColor', 'none');
-% scatter(point_stable_y1(:,1), point_stable_y1(:,2), 'filled', 'MarkerFaceColor', [0.9, 0.3, 0.2], 'MarkerEdgeColor', 'none');
-
-hold on; % 保持当前图形
-
-
-% 绘制第3个数组
-scatter(filtered_data_x2(:,1), filtered_data_x2(:,2), 'filled', 'MarkerFaceColor', [0.3, 0.8, 0.3], 'MarkerEdgeColor', 'none');
-hold on; % 保持当前图形
-
-% 绘制第4个数组
-scatter(filtered_data_y2(:,1), filtered_data_y2(:,2), 'filled', 'MarkerFaceColor', [0.8, 0.5, 0.9], 'MarkerEdgeColor', 'none');
-hold on; % 保持当前图形
+% % 绘制第一个数组
+% scatter(filtered_data_x1(:,1), filtered_data_x1(:,2), 'filled', 'MarkerFaceColor', [0.2, 0.6, 0.9], 'MarkerEdgeColor', 'none');
+% hold on; % 保持当前图形
+% 
+% % 绘制第二个数组
+% scatter(filtered_data_y1(:,1), filtered_data_y1(:,2), 'filled', 'MarkerFaceColor', [0.2, 0.6, 0.9], 'MarkerEdgeColor', 'none');
+% % scatter(point_stable_y1(:,1), point_stable_y1(:,2), 'filled', 'MarkerFaceColor', [0.9, 0.3, 0.2], 'MarkerEdgeColor', 'none');
+% 
+% hold on; % 保持当前图形
+% 
+% 
+% % 绘制第3个数组
+% scatter(filtered_data_x2(:,1), filtered_data_x2(:,2), 'filled', 'MarkerFaceColor', [0.2, 0.6, 0.9], 'MarkerEdgeColor', 'none');
+% hold on; % 保持当前图形
+% 
+% % 绘制第4个数组
+% scatter(filtered_data_y2(:,1), filtered_data_y2(:,2), 'filled', 'MarkerFaceColor', [0.2, 0.6, 0.9], 'MarkerEdgeColor', 'none');
+% hold on; % 保持当前图形
 
 % 添加图例
-legend('x1', 'y1', 'x2', 'y2');
+% legend('x1', 'y1', 'x2', 'y2');
 axis equal
 % 添加标题和标签
 title('Real-time Position of the Chip');
@@ -245,9 +250,9 @@ hold on;
 % for i = 1:length(x)-1
 %     text(x(i), y(i), sprintf('(%d, %d)', x(i), y(i)), 'FontSize', 10, 'Color', 'blue');
 % end
-legend('x1', 'y1', 'x2', 'y2','Ground Truth');
+legend('Lighthouse Tracking','Ground Truth');
 % 添加标题和标签
-title('Real-time Position of the Chip');
+title('Real-time Position of SCUM');
 xlabel('X-axis (mm)', 'FontSize', 12);
 ylabel('Y-axis (mm)', 'FontSize', 12);
 
