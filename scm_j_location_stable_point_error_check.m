@@ -3,7 +3,7 @@ clc;
 clear;
 
 % load("data_2024-10-26_16-28_p2point.mat");
-load("data_2025-03-03_19-10.mat");
+load("data_2025-03-04_15-37.mat");
 % # 单位mm
 lighthouse_height = 543;
 % # 120Hz for sync light
@@ -78,7 +78,7 @@ x2 = point_calib_r(1,1); y2 = point_calib_r(1,2);
 
 % 目标坐标
 x1_prime = 100; y1_prime = 180;
-x2_prime = 180; y2_prime = 100;
+x2_prime = 250; y2_prime = 100;
 
 % 计算缩放因子
 s_x = (x2_prime - x1_prime) / (x2 - x1);
@@ -108,6 +108,8 @@ valid_indices = point_stable(:,1) >= -100 & point_stable(:,1) <= 350 & ...
                 point_stable(:,2) >= 0 & point_stable(:,2) <= 250;
 point_stable = point_stable(valid_indices, :);
 
+% X1
+
 j = 1;
 for i=1:length(point_label)
     if (point_label(i,1)==1)
@@ -121,6 +123,15 @@ end
 valid_indices = point_stable_x1(:,1) >= -100 & point_stable_x1(:,1) <= 350 & ...
                 point_stable_x1(:,2) >= 0 & point_stable_x1(:,2) <= 250;
 point_stable_x1 = point_stable_x1(valid_indices, :);
+% 离群值滤波
+% 查找并去除异常值
+outliers_x1x = isoutlier(point_stable_x1(:,1));
+outliers_x1y = isoutlier(point_stable_x1(:,2));
+
+% 仅保留非异常值
+filtered_data_x1 = point_stable_x1(~outliers_x1x & ~outliers_x1y, :);
+
+% Y1
 
 j = 1;
 for i=1:length(point_label)
@@ -135,25 +146,121 @@ end
 valid_indices = point_stable_y1(:,1) >= -100 & point_stable_y1(:,1) <= 350 & ...
                 point_stable_y1(:,2) >= 0 & point_stable_y1(:,2) <= 250;
 point_stable_y1 = point_stable_y1(valid_indices, :);
+% 离群值滤波
+% 查找并去除异常值
+outliers_y1x = isoutlier(point_stable_y1(:,1),"mean");
+outliers_y1y = isoutlier(point_stable_y1(:,2),"mean");
+
+% 仅保留非异常值
+filtered_data_y1 = point_stable_y1(~outliers_y1x & ~outliers_y1y, :);
+
+
+% X2
+
+j = 1;
+for i=1:length(point_label)
+    if (point_label(i,1)==3)
+        point_stable_x2(j,1) = point_calibed_xy(i,1);
+        point_stable_x2(j,2) = point_calibed_xy(i,2);
+        j = j+1;
+    end
+end
+
+% 对point_stable_x2进行坐标范围滤波
+valid_indices = point_stable_x2(:,1) >= -100 & point_stable_x2(:,1) <= 350 & ...
+                point_stable_x2(:,2) >= 0 & point_stable_x2(:,2) <= 250;
+point_stable_x2 = point_stable_x2(valid_indices, :);
+% 离群值滤波
+% 查找并去除异常值
+outliers_x2x = isoutlier(point_stable_x2(:,1));
+outliers_x2y = isoutlier(point_stable_x2(:,2));
+
+% 仅保留非异常值
+filtered_data_x2 = point_stable_x2(~outliers_x2x & ~outliers_x2y, :);
+
+% Y2
+
+j = 1;
+for i=1:length(point_label)
+    if (point_label(i,1)==4)
+        point_stable_y2(j,1) = point_calibed_xy(i,1);
+        point_stable_y2(j,2) = point_calibed_xy(i,2);
+        j = j+1;
+    end
+end
+
+% 对point_stable_y1进行坐标范围滤波
+valid_indices = point_stable_y2(:,1) >= -100 & point_stable_y2(:,1) <= 350 & ...
+                point_stable_y2(:,2) >= 0 & point_stable_y2(:,2) <= 250;
+point_stable_y2 = point_stable_y2(valid_indices, :);
+% 查找并去除异常值
+outliers_y2x = isoutlier(point_stable_y2(:,1));
+outliers_y2y = isoutlier(point_stable_y2(:,2));
+
+% 仅保留非异常值
+filtered_data_y2 = point_stable_y2(~outliers_y2x & ~outliers_y2y, :);
 
 % scatter(point_calibed_xy(:,1),point_calibed_xy(:,2),point_stable(:,1),point_stable(:,2))
 % 创建图形窗口
 figure;
 
 % 绘制第一个数组
-scatter(point_stable_x1(:,1), point_stable_x1(:,2), 'filled', 'MarkerFaceColor', [0.1, 0.5, 0.9], 'MarkerEdgeColor', 'none');
+scatter(filtered_data_x1(:,1), filtered_data_x1(:,2), 'filled', 'MarkerFaceColor', [0.2, 0.6, 0.9], 'MarkerEdgeColor', 'none');
 hold on; % 保持当前图形
 
 % 绘制第二个数组
-scatter(point_stable_y1(:,1), point_stable_y1(:,2), 'filled', 'MarkerFaceColor', [0.9, 0.3, 0.1], 'MarkerEdgeColor', 'none');
+scatter(filtered_data_y1(:,1), filtered_data_y1(:,2), 'filled', 'MarkerFaceColor', [0.9, 0.3, 0.2], 'MarkerEdgeColor', 'none');
+% scatter(point_stable_y1(:,1), point_stable_y1(:,2), 'filled', 'MarkerFaceColor', [0.9, 0.3, 0.2], 'MarkerEdgeColor', 'none');
+
+hold on; % 保持当前图形
+
+
+% 绘制第3个数组
+scatter(filtered_data_x2(:,1), filtered_data_x2(:,2), 'filled', 'MarkerFaceColor', [0.3, 0.8, 0.3], 'MarkerEdgeColor', 'none');
+hold on; % 保持当前图形
+
+% 绘制第4个数组
+scatter(filtered_data_y2(:,1), filtered_data_y2(:,2), 'filled', 'MarkerFaceColor', [0.8, 0.5, 0.9], 'MarkerEdgeColor', 'none');
+hold on; % 保持当前图形
 
 % 添加图例
-legend('x1', 'y1');
+legend('x1', 'y1', 'x2', 'y2');
 axis equal
 % 添加标题和标签
-title('Scatter Plot of Two Arrays');
+title('Real-time Position of the Chip');
 xlabel('X-axis (mm)');
 ylabel('Y-axis (mm)');
 %% 更换代码
 
+% 矩形的四个顶点（倾斜矩形）
+x = [6.7875, 2.34313, 282.333, 287.029, 6.7875]; % X 坐标
+y = [217.443, 82.2525, 72.3898, 208.658, 217.443]; % Y 坐标
 
+% 绘制矩形
+% figure;
+plot(x, y, 'r--', 'LineWidth', 2); % 红色虚线，线宽为 2
+hold on;
+
+% 标注顶点
+% for i = 1:length(x)-1
+%     text(x(i), y(i), sprintf('(%d, %d)', x(i), y(i)), 'FontSize', 10, 'Color', 'blue');
+% end
+legend('x1', 'y1', 'x2', 'y2','Ground Truth');
+% 添加标题和标签
+title('Real-time Position of the Chip');
+xlabel('X-axis (mm)', 'FontSize', 12);
+ylabel('Y-axis (mm)', 'FontSize', 12);
+
+% 设置坐标轴比例和范围
+axis equal; % 保持 X 和 Y 轴比例一致
+grid on;
+
+%% matlab 没有小提琴图，转python 了
+% 获取当前日期和时间
+timestamp = datetime('now', 'Format', 'yyyy-MM-dd_HH-mm');
+
+% 创建文件名
+filename = sprintf('scm.trajectory.data_%s.mat', char(timestamp));
+
+% 保存数据到MAT文件
+save(filename, 'filtered_data_x1','filtered_data_x2','filtered_data_y1','filtered_data_y2','x',"y");
