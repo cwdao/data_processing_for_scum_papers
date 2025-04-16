@@ -263,8 +263,8 @@ text(theoretical_value + 0.0005, max(f) * 0.9, 'Theoretical Value', 'FontSize', 
     'HorizontalAlignment', 'left', 'BackgroundColor', 'white', 'EdgeColor', 'none');
 
 % 标注 ppm 范围
-xline(theoretical_value - delta, 'g--', 'LineWidth', 2, 'DisplayName', ['-40 ppm (' num2str(theoretical_value - delta, '%.6f') ' ms)']);
-xline(theoretical_value + delta, 'g--', 'LineWidth', 2, 'DisplayName', ['+40 ppm (' num2str(theoretical_value + delta, '%.6f') ' ms)']);
+% xline(theoretical_value - delta, 'g--', 'LineWidth', 2, 'DisplayName', ['-40 ppm (' num2str(theoretical_value - delta, '%.6f') ' ms)']);
+% xline(theoretical_value + delta, 'g--', 'LineWidth', 2, 'DisplayName', ['+40 ppm (' num2str(theoretical_value + delta, '%.6f') ' ms)']);
 
 % 添加矩形填充阴影
 ylim_vals = ylim; % 获取 Y 轴范围
@@ -299,8 +299,10 @@ title('Period Distribution', 'FontSize', 18, 'FontName', 'Arial');
 % yticks(0:100:600);
 
 % 添加图例
+% legend('Histogram', 'KDE Curve', 'Gaussian Fit', 'Theoretical Value', ...
+%     '-40 ppm', '+40 ppm', '40 ppm Range', 'Location', 'NorthWest', 'FontSize', 10, 'FontName', 'Arial', 'Box', 'off');
 legend('Histogram', 'KDE Curve', 'Gaussian Fit', 'Theoretical Value', ...
-    '-40 ppm', '+40 ppm', '40 ppm Range', 'Location', 'NorthWest', 'FontSize', 10, 'FontName', 'Arial', 'Box', 'off');
+     '40 ppm Range', 'Location', 'NorthWest', 'FontSize', 10, 'FontName', 'Arial', 'Box', 'off');
 grid on
 
 % 子图 2: 软件读取信号
@@ -329,8 +331,8 @@ text(theoretical_value + 0.0005, max(f) * 0.9, 'Theoretical Value', 'FontSize', 
     'HorizontalAlignment', 'left', 'BackgroundColor', 'white', 'EdgeColor', 'none');
 
 % 标注 ppm 范围
-xline(theoretical_value - delta, 'g--', 'LineWidth', 2, 'DisplayName', ['-40 ppm (' num2str(theoretical_value - delta, '%.6f') ' ms)']);
-xline(theoretical_value + delta, 'g--', 'LineWidth', 2, 'DisplayName', ['+40 ppm (' num2str(theoretical_value + delta, '%.6f') ' ms)']);
+% xline(theoretical_value - delta, 'g--', 'LineWidth', 2, 'DisplayName', ['-40 ppm (' num2str(theoretical_value - delta, '%.6f') ' ms)']);
+% xline(theoretical_value + delta, 'g--', 'LineWidth', 2, 'DisplayName', ['+40 ppm (' num2str(theoretical_value + delta, '%.6f') ' ms)']);
 
 % 添加矩形填充阴影
 ylim_vals = ylim; % 获取 Y 轴范围
@@ -363,8 +365,10 @@ t6 = text(8.335, max(f) * 0.5, ['Within 40 ppm = ', num2str(in_range, '%.2f'), '
 xlabel('Sync light periods read by SCUM IO (ms)', 'FontSize', 14, 'FontName', 'Arial');
 ylabel('Counts', 'FontSize', 14, 'FontName', 'Arial');
 title('Software Processed Signal', 'FontSize', 18, 'FontName', 'Arial');
+% legend('Histogram', 'KDE Curve', 'Gaussian Fit', 'Theoretical Value', ...
+%     '-40 ppm', '+40 ppm', '40 ppm Range', 'Location', 'NorthWest', 'FontSize', 10, 'FontName', 'Arial', 'Box', 'off');
 legend('Histogram', 'KDE Curve', 'Gaussian Fit', 'Theoretical Value', ...
-    '-40 ppm', '+40 ppm', '40 ppm Range', 'Location', 'NorthWest', 'FontSize', 10, 'FontName', 'Arial', 'Box', 'off');
+     '40 ppm Range', 'Location', 'NorthWest', 'FontSize', 10, 'FontName', 'Arial', 'Box', 'off');
 grid on
 
 % 调整整体布局
@@ -475,8 +479,8 @@ xline(theoretical_value, 'r-', 'LineWidth', 2, 'DisplayName', 'Theoretical Value
 %     'HorizontalAlignment', 'left', 'BackgroundColor', 'white', 'EdgeColor', 'none');
 
 % 标注 ppm 范围
-xline(theoretical_value - delta, 'g--', 'LineWidth', 2, 'DisplayName', ['-40 ppm (' num2str(theoretical_value - delta, '%.6f') ' ms)']);
-xline(theoretical_value + delta, 'g--', 'LineWidth', 2, 'DisplayName', ['+40 ppm (' num2str(theoretical_value + delta, '%.6f') ' ms)']);
+% xline(theoretical_value - delta, 'g--', 'LineWidth', 2, 'DisplayName', ['-40 ppm (' num2str(theoretical_value - delta, '%.6f') ' ms)']);
+% xline(theoretical_value + delta, 'g--', 'LineWidth', 2, 'DisplayName', ['+40 ppm (' num2str(theoretical_value + delta, '%.6f') ' ms)']);
 
 % 添加矩形填充阴影
 ylim_vals = ylim; % 获取 Y 轴范围
@@ -517,8 +521,10 @@ title('Period Distribution', 'FontSize', 18, 'FontName', 'Arial');
 % yticks(0:100:600);
 
 % 添加图例
+% legend('Histogram', 'KDE Curve', 'Gaussian Fit', 'Theoretical Value', ...
+%     '-40 ppm', '+40 ppm', '40 ppm Range', 'Location', 'NorthWest', 'FontSize', 10, 'FontName', 'Arial', 'Box', 'off');
 legend('Histogram', 'KDE Curve', 'Gaussian Fit', 'Theoretical Value', ...
-    '-40 ppm', '+40 ppm', '40 ppm Range', 'Location', 'NorthWest', 'FontSize', 10, 'FontName', 'Arial', 'Box', 'off');
+     '40 ppm Range', 'Location', 'NorthWest', 'FontSize', 10, 'FontName', 'Arial', 'Box', 'off');
 grid on
 
 % 子图 2: 软件读取信号
@@ -547,8 +553,8 @@ xline(theoretical_value, 'r-', 'LineWidth', 2, 'DisplayName', 'Theoretical Value
 %     'HorizontalAlignment', 'left', 'BackgroundColor', 'white', 'EdgeColor', 'none');
 
 % 标注 ppm 范围
-xline(theoretical_value - delta, 'g--', 'LineWidth', 2, 'DisplayName', ['-40 ppm (' num2str(theoretical_value - delta, '%.6f') ' ms)']);
-xline(theoretical_value + delta, 'g--', 'LineWidth', 2, 'DisplayName', ['+40 ppm (' num2str(theoretical_value + delta, '%.6f') ' ms)']);
+% xline(theoretical_value - delta, 'g--', 'LineWidth', 2, 'DisplayName', ['-40 ppm (' num2str(theoretical_value - delta, '%.6f') ' ms)']);
+% xline(theoretical_value + delta, 'g--', 'LineWidth', 2, 'DisplayName', ['+40 ppm (' num2str(theoretical_value + delta, '%.6f') ' ms)']);
 
 % 添加矩形填充阴影
 ylim_vals = ylim; % 获取 Y 轴范围
@@ -584,8 +590,10 @@ uistack(t41, 'top');
 xlabel('Sync light periods read by SCUM IO (ms)', 'FontSize', 14, 'FontName', 'Arial');
 ylabel('Counts', 'FontSize', 14, 'FontName', 'Arial');
 title('Software Processed Signal', 'FontSize', 18, 'FontName', 'Arial');
+% legend('Histogram', 'KDE Curve', 'Gaussian Fit', 'Theoretical Value', ...
+%     '-40 ppm', '+40 ppm', '40 ppm Range', 'Location', 'NorthWest', 'FontSize', 10, 'FontName', 'Arial', 'Box', 'off');
 legend('Histogram', 'KDE Curve', 'Gaussian Fit', 'Theoretical Value', ...
-    '-40 ppm', '+40 ppm', '40 ppm Range', 'Location', 'NorthWest', 'FontSize', 10, 'FontName', 'Arial', 'Box', 'off');
+     '40 ppm Range', 'Location', 'NorthWest', 'FontSize', 10, 'FontName', 'Arial', 'Box', 'off');
 grid on
 
 % 调整整体布局
