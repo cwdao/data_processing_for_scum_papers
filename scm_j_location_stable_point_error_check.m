@@ -232,7 +232,7 @@ hold on; % 保持当前图形
 % legend('x1', 'y1', 'x2', 'y2');
 axis equal
 % 添加标题和标签
-title('Real-time Position of the Chip');
+% title('Real-time Position of the Chip');
 xlabel('X-axis (mm)');
 ylabel('Y-axis (mm)');
 %% 更换代码
@@ -251,8 +251,9 @@ hold on;
 %     text(x(i), y(i), sprintf('(%d, %d)', x(i), y(i)), 'FontSize', 10, 'Color', 'blue');
 % end
 legend('Lighthouse Tracking','Ground Truth');
+box on  % 打开坐标轴边框
 % 添加标题和标签
-title('Real-time Position of SCUM');
+% title('Real-time Position of SCUM');
 xlabel('X-axis (mm)', 'FontSize', 12);
 ylabel('Y-axis (mm)', 'FontSize', 12);
 
