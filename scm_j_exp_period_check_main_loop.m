@@ -35,6 +35,7 @@ end
 %% 子周期取出来，但不一定有用
 jk = 1;
 jl = 1;
+period_lct = zeros(5,1);
 for i = 3:length(signaldata)-1
     % 1 是周期开始，首先是定位，用后面的0时刻减去此时刻得到定位周期
     if (signaldata(i,1) == 1)
@@ -46,9 +47,9 @@ for i = 3:length(signaldata)-1
         period_ble(jl,1) =  timeframe(i+1,1)-timeframe(i,1);
         jl = jl+1;
     end
-    period_ble(jl-1,1)=[];
+    % period_ble(jl-1,1)=[];
 end
-
+ period_ble(jl-1)=[];
 %% 画直方图
 
 figure(101)
