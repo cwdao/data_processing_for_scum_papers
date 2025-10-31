@@ -52,22 +52,23 @@ end
  period_ble(jl-1)=[];
 %% 画直方图
 
-figure(101)
-subplot(1,3,1)
-ylabel('Counts');
-xlabel('Main Loop periods (ms)');
-hold on
-% 放大坐标到ms
-period_show = period * 1000;
-h101 = histogram(period_show);
-h101.EdgeColor = "black";
-h101.FaceColor = "#e89776";
-h101.LineWidth = 1;
-set(gca,'FontName','Times New Roman','FontSize',24,'linewidth',1.5, ...
-    'XMinorGrid','on','YMinorGrid','on','box','on');
+% figure(101)
+% subplot(1,3,1)
+% ylabel('Counts');
+% xlabel('Main Loop periods (ms)');
+% hold on
+% % 放大坐标到ms
+% period_show = period * 1000;
+% h101 = histogram(period_show);
+% h101.EdgeColor = "black";
+% h101.FaceColor = "#e89776";
+% h101.LineWidth = 1;
+% set(gca,'FontName','Times New Roman','FontSize',24,'linewidth',1.5, ...
+%     'XMinorGrid','on','YMinorGrid','on','box','on');
 
 % figure(102)
-subplot(1,3,2)
+% subplot(1,3,2)
+subplot(1,2,1)
 ylabel('Counts');
 xlabel('Localization periods (ms)');
 hold on
@@ -81,7 +82,8 @@ set(gca,'FontName','Times New Roman','FontSize',24,'linewidth',1.5, ...
     'XMinorGrid','on','YMinorGrid','on','box','on');
 
 % figure(103)
-subplot(1,3,3)
+% subplot(1,3,3)
+subplot(1,2,2)
 ylabel('Counts');
 xlabel('BLE TX periods (ms)');
 hold on
@@ -89,7 +91,7 @@ hold on
 period_show = period_ble * 1000;
 h101 = histogram(period_show);
 h101.EdgeColor = "black";
-h101.FaceColor = "#e89776";
+h101.FaceColor = "#61cbf4";
 h101.LineWidth = 1;
 set(gca,'FontName','Times New Roman','FontSize',24,'linewidth',1.5, ...
     'XMinorGrid','on','YMinorGrid','on','box','on');
