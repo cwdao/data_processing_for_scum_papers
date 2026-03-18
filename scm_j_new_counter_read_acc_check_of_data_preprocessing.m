@@ -116,7 +116,7 @@ performance_read_40ppm = c_read_40ppm/length(period_sync_read);
 % figure(1)
 % set(gca,'FontName','Times New Roman','FontSize',24,'linewidth',1.5, ...
 %     'XMinorGrid','off','YMinorGrid','off','box','off');
-figure(101)
+figure(6101)
 % subplot(1,2,1)
 ylabel('Counts');
 xlabel('Sync light periods read by SCUM optical receiver (ms)');
@@ -133,7 +133,7 @@ set(gca,'FontName','Times New Roman','FontSize',24,'linewidth',1.5, ...
 
 
 % 由IO读取的原始周期
-figure(102)
+figure(6102)
 % subplot(1,2,2)
 ylabel('Counts');
 xlabel('Sync light periods read by SCUM IO (ms)');
@@ -241,25 +241,23 @@ subplot2_position = [0.55, 0.1, 0.35, 0.5]; % 右侧子图的位置 [x, y, width
 subplot(1, 2, 1); % 创建第一个子图
 set(gca, 'Position', subplot1_position); % 设置子图的位置
 h1 = histogram(period_show_hw, 'Normalization', 'pdf');
+h1.DisplayName = 'Histogram';
 h1.EdgeColor = "black";
 h1.FaceColor = "#e89776";
 h1.FaceAlpha = 0.7;
 hold on
-
-% KDE 曲线
-[f, xi] = ksdensity(period_show_hw);
-plot(xi, f, 'k-', 'LineWidth', 2, 'DisplayName', 'KDE Curve');
+yMax = max(h1.Values);
 
 % 高斯拟合曲线
 pd = fitdist(period_show_hw, 'Normal');
 x_fit = linspace(min(period_show_hw), max(period_show_hw), 100);
 y_fit = pdf(pd, x_fit);
-plot(x_fit, y_fit, 'b--', 'LineWidth', 2, 'DisplayName', ...
+hGauss = plot(x_fit, y_fit, 'b--', 'LineWidth', 2, 'DisplayName', ...
     ['Gaussian Fit (\mu=', num2str(pd.mu, '%.4f'), ', \sigma=', num2str(pd.sigma, '%.4f'), ')']);
 
 % 理论值标注
-xline(theoretical_value, 'r-', 'LineWidth', 2, 'DisplayName', 'Theoretical Value');
-text(theoretical_value + 0.0005, max(f) * 0.9, 'Theoretical Value', 'FontSize', 14, 'Color', 'red', ...
+hTheory = xline(theoretical_value, 'r-', 'LineWidth', 2, 'DisplayName', 'Theoretical Value');
+text(theoretical_value + 0.0005, yMax * 0.9, 'Theoretical Value', 'FontSize', 14, 'Color', 'red', ...
     'HorizontalAlignment', 'left', 'BackgroundColor', 'white', 'EdgeColor', 'none');
 
 % 标注 ppm 范围
@@ -268,7 +266,7 @@ text(theoretical_value + 0.0005, max(f) * 0.9, 'Theoretical Value', 'FontSize', 
 
 % 添加矩形填充阴影
 ylim_vals = ylim; % 获取 Y 轴范围
-fill([theoretical_value - delta, theoretical_value + delta, theoretical_value + delta, theoretical_value - delta], ...
+hFill = fill([theoretical_value - delta, theoretical_value + delta, theoretical_value + delta, theoretical_value - delta], ...
      [ylim_vals(1), ylim_vals(1), ylim_vals(2), ylim_vals(2)], ...
      [0.66, 0.82, 0.55], 'FaceAlpha', 0.3, 'EdgeColor', 'none', 'DisplayName', '40 ppm Range');
 
@@ -276,21 +274,21 @@ fill([theoretical_value - delta, theoretical_value + delta, theoretical_value + 
 in_range = sum((period_show_hw >= (theoretical_value - delta)) & (period_show_hw <= (theoretical_value + delta))) / length(period_show_hw) * 100;
 
 % 创建文字对象
-t1 = text(8.334, max(f) * 0.7, ['\mu = ', num2str(pd.mu, '%.4f')], ...
+t1 = text(8.334, yMax * 0.7, ['\mu = ', num2str(pd.mu, '%.4f')], ...
     'FontSize', 14, 'Color', 'blue', 'HorizontalAlignment', 'left', ...
     'BackgroundColor', 'white', 'EdgeColor', 'none');
-t2 = text(8.334, max(f) * 0.6, ['\sigma = ', num2str(pd.sigma, '%.4f')], ...
+t2 = text(8.334, yMax * 0.6, ['\sigma = ', num2str(pd.sigma, '%.4f')], ...
     'FontSize', 14, 'Color', 'blue', 'HorizontalAlignment', 'left', ...
     'BackgroundColor', 'white', 'EdgeColor', 'none');
-t3 = text(8.334, max(f) * 0.5, ['Within 40 ppm = ', num2str(in_range, '%.2f'), '%'], ...
+t3 = text(8.334, yMax * 0.5, ['Within 40 ppm = ', num2str(in_range, '%.2f'), '%'], ...
     'FontSize', 13, 'Color', 'green', 'HorizontalAlignment', 'left', ...
     'BackgroundColor', 'white', 'EdgeColor', 'none');
 
 
 % 设置标题和坐标轴标签
-xlabel('Sync light periods read by SCUM optical receiver (ms)', 'FontSize', 14, 'FontName', 'Arial');
+xlabel('Sync pulse periods read by SCUM optical receiver (ms)', 'FontSize', 14, 'FontName', 'Arial');
 ylabel('Counts', 'FontSize', 14, 'FontName', 'Arial');
-title('Period Distribution', 'FontSize', 18, 'FontName', 'Arial');
+% title removed
 
 % % 设置坐标轴和网格
 % set(gca, 'FontName', 'Times New Roman', 'FontSize', 24, 'LineWidth', 1.5, ...
@@ -299,35 +297,32 @@ title('Period Distribution', 'FontSize', 18, 'FontName', 'Arial');
 % yticks(0:100:600);
 
 % 添加图例
-% legend('Histogram', 'KDE Curve', 'Gaussian Fit', 'Theoretical Value', ...
-%     '-40 ppm', '+40 ppm', '40 ppm Range', 'Location', 'NorthWest', 'FontSize', 10, 'FontName', 'Arial', 'Box', 'off');
-legend('Histogram', 'KDE Curve', 'Gaussian Fit', 'Theoretical Value', ...
-     '40 ppm Range', 'Location', 'NorthWest', 'FontSize', 10, 'FontName', 'Arial', 'Box', 'off');
+legend([h1, hGauss, hTheory, hFill], ...
+    {'Histogram', 'Gaussian Fit', 'Theoretical Value', '40 ppm Range'}, ...
+    'Location', 'NorthWest', 'FontSize', 10, 'FontName', 'Arial', 'Box', 'off');
 grid on
 
 % 子图 2: 软件读取信号
 subplot(1, 2, 2); % 创建第二个子图
 set(gca, 'Position', subplot2_position); % 设置子图的位置
 h2 = histogram(period_show_sw, 'Normalization', 'pdf');
+h2.DisplayName = 'Histogram';
 h2.EdgeColor = "black";
 h2.FaceColor = "#76a6e8"; % 不同颜色
 h2.FaceAlpha = 0.7;
 hold on
-
-% KDE 曲线
-[f, xi] = ksdensity(period_show_sw);
-plot(xi, f, 'k-', 'LineWidth', 2, 'DisplayName', 'KDE Curve');
+yMax = max(h2.Values);
 
 % 高斯拟合曲线
 pd = fitdist(period_show_sw, 'Normal');
 x_fit = linspace(min(period_show_sw), max(period_show_sw), 100);
 y_fit = pdf(pd, x_fit);
-plot(x_fit, y_fit, 'b--', 'LineWidth', 2, 'DisplayName', ...
+hGauss = plot(x_fit, y_fit, 'b--', 'LineWidth', 2, 'DisplayName', ...
     ['Gaussian Fit (\mu=', num2str(pd.mu, '%.4f'), ', \sigma=', num2str(pd.sigma, '%.4f'), ')']);
 
 % 理论值标注
-xline(theoretical_value, 'r-', 'LineWidth', 2, 'DisplayName', 'Theoretical Value');
-text(theoretical_value + 0.0005, max(f) * 0.9, 'Theoretical Value', 'FontSize', 14, 'Color', 'red', ...
+hTheory = xline(theoretical_value, 'r-', 'LineWidth', 2, 'DisplayName', 'Theoretical Value');
+text(theoretical_value + 0.0005, yMax * 0.9, 'Theoretical Value', 'FontSize', 14, 'Color', 'red', ...
     'HorizontalAlignment', 'left', 'BackgroundColor', 'white', 'EdgeColor', 'none');
 
 % 标注 ppm 范围
@@ -336,7 +331,7 @@ text(theoretical_value + 0.0005, max(f) * 0.9, 'Theoretical Value', 'FontSize', 
 
 % 添加矩形填充阴影
 ylim_vals = ylim; % 获取 Y 轴范围
-fill([theoretical_value - delta, theoretical_value + delta, theoretical_value + delta, theoretical_value - delta], ...
+hFill = fill([theoretical_value - delta, theoretical_value + delta, theoretical_value + delta, theoretical_value - delta], ...
      [ylim_vals(1), ylim_vals(1), ylim_vals(2), ylim_vals(2)], ...
      [0.66, 0.82, 0.55], 'FaceAlpha', 0.3, 'EdgeColor', 'none', 'DisplayName', '40 ppm Range');
 
@@ -346,13 +341,13 @@ in_range = sum((period_show_sw >= (theoretical_value - delta)) & (period_show_sw
 
 
 % 创建文字对象
-t4 = text(8.335, max(f) * 0.7, ['\mu = ', num2str(pd.mu, '%.4f')], ...
+t4 = text(8.335, yMax * 0.7, ['\mu = ', num2str(pd.mu, '%.4f')], ...
     'FontSize', 14, 'Color', 'blue', 'HorizontalAlignment', 'left', ...
     'BackgroundColor', 'white', 'EdgeColor', 'none');
-t5 = text(8.335, max(f) * 0.6, ['\sigma = ', num2str(pd.sigma, '%.4f')], ...
+t5 = text(8.335, yMax * 0.6, ['\sigma = ', num2str(pd.sigma, '%.4f')], ...
     'FontSize', 14, 'Color', 'blue', 'HorizontalAlignment', 'left', ...
     'BackgroundColor', 'white', 'EdgeColor', 'none');
-t6 = text(8.335, max(f) * 0.5, ['Within 40 ppm = ', num2str(in_range, '%.2f'), '%'], ...
+t6 = text(8.335, yMax * 0.5, ['Within 40 ppm = ', num2str(in_range, '%.2f'), '%'], ...
     'FontSize', 14, 'Color', 'green', 'HorizontalAlignment', 'left', ...
     'BackgroundColor', 'white', 'EdgeColor', 'none');
 
@@ -362,13 +357,14 @@ t6 = text(8.335, max(f) * 0.5, ['Within 40 ppm = ', num2str(in_range, '%.2f'), '
 % uistack(t3, 'top');
 
 % 设置子图 2 的标题和坐标轴
-xlabel('Sync light periods read by SCUM IO (ms)', 'FontSize', 14, 'FontName', 'Arial');
+xlabel('Sync pulse periods read by SCUM IO (ms)', 'FontSize', 14, 'FontName', 'Arial');
 ylabel('Counts', 'FontSize', 14, 'FontName', 'Arial');
-title('Software Processed Signal', 'FontSize', 18, 'FontName', 'Arial');
+% title removed
 % legend('Histogram', 'KDE Curve', 'Gaussian Fit', 'Theoretical Value', ...
 %     '-40 ppm', '+40 ppm', '40 ppm Range', 'Location', 'NorthWest', 'FontSize', 10, 'FontName', 'Arial', 'Box', 'off');
-legend('Histogram', 'KDE Curve', 'Gaussian Fit', 'Theoretical Value', ...
-     '40 ppm Range', 'Location', 'NorthWest', 'FontSize', 10, 'FontName', 'Arial', 'Box', 'off');
+legend([h2, hGauss, hTheory, hFill], ...
+    {'Histogram', 'Gaussian Fit', 'Theoretical Value', '40 ppm Range'}, ...
+    'Location', 'NorthWest', 'FontSize', 10, 'FontName', 'Arial', 'Box', 'off');
 grid on
 
 % 调整整体布局
@@ -380,6 +376,61 @@ exportgraphics(gcf, 'Hardware_vs_Software_16_9.pdf', 'ContentType', 'vector');
 % 如果需要使用传统方法：
 % print(gcf, 'Hardware_vs_Software_16_9', '-dpdf', '-painters');
 
+%% 拆分 figure(1042) 为 figure(101)/(102) 并分别导出 PDF（去标题/去KDE，其他保持一致）
+
+% figure 101: 原左侧子图（optical receiver）
+figure(101);
+set(gcf, 'Units', 'pixels', 'Position', [100, 100, 400, 350]);
+h1 = histogram(period_show_hw, 'Normalization', 'pdf');
+h1.DisplayName = 'Histogram';
+h1.EdgeColor = "black";
+h1.FaceColor = "#e89776";
+h1.FaceAlpha = 0.7;
+hold on
+yMax = max(h1.Values);
+% hTheory = xline(theoretical_value, 'r-', 'LineWidth', 2, 'DisplayName', 'Theoretical Value');
+hTheory = xline(theoretical_value, 'r-', 'LineWidth', 2, 'DisplayName', 'Theoretical Value');
+ylim_vals = ylim;
+hFill = fill([theoretical_value - delta, theoretical_value + delta, theoretical_value + delta, theoretical_value - delta], ...
+    [ylim_vals(1), ylim_vals(1), ylim_vals(2), ylim_vals(2)], ...
+    [0.66, 0.82, 0.55], 'FaceAlpha', 0.3, 'EdgeColor', 'none', 'DisplayName', '40 ppm Range');
+in_range = sum((period_show_hw >= (theoretical_value - delta)) & (period_show_hw <= (theoretical_value + delta))) / length(period_show_hw) * 100;
+% xlabel('Sync pulse periods read by SCUM optical receiver (ms)', 'FontSize', 14, 'FontName', 'Arial');
+ylabel('Counts', 'FontSize', 14, 'FontName', 'Arial');
+title(sprintf('(within 40ppm=%.2f%%)', in_range), 'FontSize', 12, 'FontName', 'Arial');
+legend([h1, hTheory, hFill], ...
+    {'Histogram', 'Theoretical Value', '40 ppm Range'}, ...
+    'Location', 'NorthWest', 'FontSize', 10, 'FontName', 'Arial', 'Box', 'off');
+grid on
+xlabel('');
+exportgraphics(gcf, 'figure_101.pdf', 'ContentType', 'vector');
+
+% figure 102: 原右侧子图（SCUM IO）
+figure(102);
+set(gcf, 'Units', 'pixels', 'Position', [100, 100, 400, 350]);
+h2 = histogram(period_show_sw, 'Normalization', 'pdf');
+h2.DisplayName = 'Histogram';
+h2.EdgeColor = "black";
+h2.FaceColor = "#76a6e8";
+h2.FaceAlpha = 0.7;
+hold on
+yMax = max(h2.Values);
+hTheory = xline(theoretical_value, 'r-', 'LineWidth', 2, 'DisplayName', 'Theoretical Value');
+ylim_vals = ylim;
+hFill = fill([theoretical_value - delta, theoretical_value + delta, theoretical_value + delta, theoretical_value - delta], ...
+    [ylim_vals(1), ylim_vals(1), ylim_vals(2), ylim_vals(2)], ...
+    [0.66, 0.82, 0.55], 'FaceAlpha', 0.3, 'EdgeColor', 'none', 'DisplayName', '40 ppm Range');
+in_range = sum((period_show_sw >= (theoretical_value - delta)) & (period_show_sw <= (theoretical_value + delta))) / length(period_show_sw) * 100;
+% xlabel('Sync pulse periods read by SCUM IO (ms)', 'FontSize', 14, 'FontName', 'Arial');
+ylabel('Counts', 'FontSize', 14, 'FontName', 'Arial');
+title(sprintf('(within 40ppm=%.2f%%)', in_range), 'FontSize', 12, 'FontName', 'Arial');
+legend([h2, hTheory, hFill], ...
+    {'Histogram', 'Theoretical Value', '40 ppm Range'}, ...
+    'Location', 'NorthWest', 'FontSize', 10, 'FontName', 'Arial', 'Box', 'off');
+grid on
+xlabel('');
+exportgraphics(gcf, 'figure_102.pdf', 'ContentType', 'vector');
+
 %%  累计误差会如何？
 cumu_timewin = 12;
 cumu_timestep = 1;
@@ -390,7 +441,7 @@ for i = 1:cumu_timestep:length(period_optical)-cumu_timewin
     j = j + 1;
 end
 
-figure(201)
+figure(1201)
 ylabel('Counts');
 xlabel('Average of 12 sync light periods read by SCUM optical receiver (ms)');
 hold on
@@ -417,7 +468,7 @@ for i = 1:cumu_timestep:length(period_sync_read)-cumu_timewin
     j = j + 1;
 end
 
-figure(202)
+figure(1202)
 ylabel('Counts');
 xlabel('Average of 12 sync light periods read by SCUM IO (ms)');
 hold on
@@ -457,24 +508,22 @@ delta = theoretical_value * ppm_range / 1e6; % 计算误差范围
 subplot(1, 2, 1); % 创建第一个子图
 set(gca, 'Position', subplot1_position); % 设置子图的位置
 h1 = histogram(period_show_hw, 'Normalization', 'pdf');
+h1.DisplayName = 'Histogram';
 h1.EdgeColor = "black";
 h1.FaceColor = "#e89776";
 h1.FaceAlpha = 0.7;
 hold on
-
-% KDE 曲线
-[f, xi] = ksdensity(period_show_hw);
-plot(xi, f, 'k-', 'LineWidth', 2, 'DisplayName', 'KDE Curve');
+yMax = max(h1.Values);
 
 % 高斯拟合曲线
 pd = fitdist(period_show_hw, 'Normal');
 x_fit = linspace(min(period_show_hw), max(period_show_hw), 100);
 y_fit = pdf(pd, x_fit);
-plot(x_fit, y_fit, 'b--', 'LineWidth', 2, 'DisplayName', ...
+hGauss = plot(x_fit, y_fit, 'b--', 'LineWidth', 2, 'DisplayName', ...
     ['Gaussian Fit (\mu=', num2str(pd.mu, '%.4f'), ', \sigma=', num2str(pd.sigma, '%.4f'), ')']);
 
 % 理论值标注
-xline(theoretical_value, 'r-', 'LineWidth', 2, 'DisplayName', 'Theoretical Value');
+hTheory = xline(theoretical_value, 'r-', 'LineWidth', 2, 'DisplayName', 'Theoretical Value');
 % text(theoretical_value + 0.0001, max(f) * 0.9, 'Theoretical Value', 'FontSize', 18, 'Color', 'red', ...
 %     'HorizontalAlignment', 'left', 'BackgroundColor', 'white', 'EdgeColor', 'none');
 
@@ -484,7 +533,7 @@ xline(theoretical_value, 'r-', 'LineWidth', 2, 'DisplayName', 'Theoretical Value
 
 % 添加矩形填充阴影
 ylim_vals = ylim; % 获取 Y 轴范围
-fill([theoretical_value - delta, theoretical_value + delta, theoretical_value + delta, theoretical_value - delta], ...
+hFill = fill([theoretical_value - delta, theoretical_value + delta, theoretical_value + delta, theoretical_value - delta], ...
      [ylim_vals(1), ylim_vals(1), ylim_vals(2), ylim_vals(2)], ...
      [0.66, 0.82, 0.55], 'FaceAlpha', 0.3, 'EdgeColor', 'none', 'DisplayName', '40 ppm Range');
 
@@ -492,15 +541,15 @@ fill([theoretical_value - delta, theoretical_value + delta, theoretical_value + 
 in_range = sum((period_show_hw >= (theoretical_value - delta)) & (period_show_hw <= (theoretical_value + delta))) / length(period_show_hw) * 100;
 
 % 创建文字对象
-t11 = text(theoretical_value + 0.0001, max(f) * 0.9, 'Theoretical Value', 'FontSize', 14, 'Color', 'red', ...
+t11 = text(theoretical_value + 0.0001, yMax * 0.9, 'Theoretical Value', 'FontSize', 14, 'Color', 'red', ...
     'HorizontalAlignment', 'left', 'BackgroundColor', 'white', 'EdgeColor', 'none');
-t1 = text(8.3334, max(f) * 0.7, ['\mu = ', num2str(pd.mu, '%.4f')], ...
+t1 = text(8.3334, yMax * 0.7, ['\mu = ', num2str(pd.mu, '%.4f')], ...
     'FontSize', 14, 'Color', 'blue', 'HorizontalAlignment', 'left', ...
     'BackgroundColor', 'white', 'EdgeColor', 'none');
-t2 = text(8.3334, max(f) * 0.6, ['\sigma = ', num2str(pd.sigma, '%.4f')], ...
+t2 = text(8.3334, yMax * 0.6, ['\sigma = ', num2str(pd.sigma, '%.4f')], ...
     'FontSize', 14, 'Color', 'blue', 'HorizontalAlignment', 'left', ...
     'BackgroundColor', 'white', 'EdgeColor', 'none');
-t3 = text(8.3334, max(f) * 0.5, ['Within 40 ppm = ', num2str(in_range, '%.2f'), '%'], ...
+t3 = text(8.3334, yMax * 0.5, ['Within 40 ppm = ', num2str(in_range, '%.2f'), '%'], ...
     'FontSize', 14, 'Color', 'green', 'HorizontalAlignment', 'left', ...
     'BackgroundColor', 'white', 'EdgeColor', 'none');
 
@@ -512,7 +561,7 @@ t3 = text(8.3334, max(f) * 0.5, ['Within 40 ppm = ', num2str(in_range, '%.2f'), 
 % 设置标题和坐标轴标签
 xlabel('Sync light periods read by SCUM optical receiver (ms)', 'FontSize', 14, 'FontName', 'Arial');
 ylabel('Counts', 'FontSize', 14, 'FontName', 'Arial');
-title('Period Distribution', 'FontSize', 18, 'FontName', 'Arial');
+% title removed
 
 % % 设置坐标轴和网格
 % set(gca, 'FontName', 'Times New Roman', 'FontSize', 24, 'LineWidth', 1.5, ...
@@ -523,32 +572,31 @@ title('Period Distribution', 'FontSize', 18, 'FontName', 'Arial');
 % 添加图例
 % legend('Histogram', 'KDE Curve', 'Gaussian Fit', 'Theoretical Value', ...
 %     '-40 ppm', '+40 ppm', '40 ppm Range', 'Location', 'NorthWest', 'FontSize', 10, 'FontName', 'Arial', 'Box', 'off');
-legend('Histogram', 'KDE Curve', 'Gaussian Fit', 'Theoretical Value', ...
-     '40 ppm Range', 'Location', 'NorthWest', 'FontSize', 10, 'FontName', 'Arial', 'Box', 'off');
+legend([h1, hGauss, hTheory, hFill], ...
+    {'Histogram', 'Gaussian Fit', 'Theoretical Value', '40 ppm Range'}, ...
+    'Location', 'NorthWest', 'FontSize', 10, 'FontName', 'Arial', 'Box', 'off');
 grid on
 
 % 子图 2: 软件读取信号
 subplot(1, 2, 2); % 创建第二个子图
 set(gca, 'Position', subplot2_position); % 设置子图的位置
 h2 = histogram(period_show_sw, 'Normalization', 'pdf');
+h2.DisplayName = 'Histogram';
 h2.EdgeColor = "black";
 h2.FaceColor = "#76a6e8"; % 不同颜色
 h2.FaceAlpha = 0.7;
 hold on
-
-% KDE 曲线
-[f, xi] = ksdensity(period_show_sw);
-plot(xi, f, 'k-', 'LineWidth', 2, 'DisplayName', 'KDE Curve');
+yMax = max(h2.Values);
 
 % 高斯拟合曲线
 pd = fitdist(period_show_sw, 'Normal');
 x_fit = linspace(min(period_show_sw), max(period_show_sw), 100);
 y_fit = pdf(pd, x_fit);
-plot(x_fit, y_fit, 'b--', 'LineWidth', 2, 'DisplayName', ...
+hGauss = plot(x_fit, y_fit, 'b--', 'LineWidth', 2, 'DisplayName', ...
     ['Gaussian Fit (\mu=', num2str(pd.mu, '%.4f'), ', \sigma=', num2str(pd.sigma, '%.4f'), ')']);
 
 % 理论值标注
-xline(theoretical_value, 'r-', 'LineWidth', 2, 'DisplayName', 'Theoretical Value');
+hTheory = xline(theoretical_value, 'r-', 'LineWidth', 2, 'DisplayName', 'Theoretical Value');
 % text(theoretical_value + 0.0001, max(f) * 0.9, 'Theoretical Value', 'FontSize', 18, 'Color', 'red', ...
 %     'HorizontalAlignment', 'left', 'BackgroundColor', 'white', 'EdgeColor', 'none');
 
@@ -558,7 +606,7 @@ xline(theoretical_value, 'r-', 'LineWidth', 2, 'DisplayName', 'Theoretical Value
 
 % 添加矩形填充阴影
 ylim_vals = ylim; % 获取 Y 轴范围
-fill([theoretical_value - delta, theoretical_value + delta, theoretical_value + delta, theoretical_value - delta], ...
+hFill = fill([theoretical_value - delta, theoretical_value + delta, theoretical_value + delta, theoretical_value - delta], ...
      [ylim_vals(1), ylim_vals(1), ylim_vals(2), ylim_vals(2)], ...
      [0.66, 0.82, 0.55], 'FaceAlpha', 0.3, 'EdgeColor', 'none', 'DisplayName', '40 ppm Range');
 
@@ -567,17 +615,17 @@ in_range = sum((period_show_sw >= (theoretical_value - delta)) & (period_show_sw
 
 % 理论值标注
 % xline(theoretical_value, 'r-', 'LineWidth', 2, 'DisplayName', 'Theoretical Value');
-t41 = text(theoretical_value + 0.0001, max(f) * 0.9, 'Theoretical Value', 'FontSize', 14, 'Color', 'red', ...
+t41 = text(theoretical_value + 0.0001, yMax * 0.9, 'Theoretical Value', 'FontSize', 14, 'Color', 'red', ...
     'HorizontalAlignment', 'left', 'BackgroundColor', 'white', 'EdgeColor', 'none');
 
 % 创建文字对象
-t4 = text(8.3335, max(f) * 0.7, ['\mu = ', num2str(pd.mu, '%.4f')], ...
+t4 = text(8.3335, yMax * 0.7, ['\mu = ', num2str(pd.mu, '%.4f')], ...
     'FontSize', 14, 'Color', 'blue', 'HorizontalAlignment', 'left', ...
     'BackgroundColor', 'white', 'EdgeColor', 'none');
-t5 = text(8.3335, max(f) * 0.6, ['\sigma = ', num2str(pd.sigma, '%.4f')], ...
+t5 = text(8.3335, yMax * 0.6, ['\sigma = ', num2str(pd.sigma, '%.4f')], ...
     'FontSize', 14, 'Color', 'blue', 'HorizontalAlignment', 'left', ...
     'BackgroundColor', 'white', 'EdgeColor', 'none');
-t6 = text(8.3335, max(f) * 0.5, ['Within 40 ppm = ', num2str(in_range, '%.2f'), '%'], ...
+t6 = text(8.3335, yMax * 0.5, ['Within 40 ppm = ', num2str(in_range, '%.2f'), '%'], ...
     'FontSize', 14, 'Color', 'green', 'HorizontalAlignment', 'left', ...
     'BackgroundColor', 'white', 'EdgeColor', 'none');
 
@@ -589,21 +637,76 @@ uistack(t41, 'top');
 % 设置子图 2 的标题和坐标轴
 xlabel('Sync light periods read by SCUM IO (ms)', 'FontSize', 14, 'FontName', 'Arial');
 ylabel('Counts', 'FontSize', 14, 'FontName', 'Arial');
-title('Software Processed Signal', 'FontSize', 18, 'FontName', 'Arial');
+% title removed
 % legend('Histogram', 'KDE Curve', 'Gaussian Fit', 'Theoretical Value', ...
 %     '-40 ppm', '+40 ppm', '40 ppm Range', 'Location', 'NorthWest', 'FontSize', 10, 'FontName', 'Arial', 'Box', 'off');
-legend('Histogram', 'KDE Curve', 'Gaussian Fit', 'Theoretical Value', ...
-     '40 ppm Range', 'Location', 'NorthWest', 'FontSize', 10, 'FontName', 'Arial', 'Box', 'off');
+legend([h2, hGauss, hTheory, hFill], ...
+    {'Histogram', 'Gaussian Fit', 'Theoretical Value', '40 ppm Range'}, ...
+    'Location', 'NorthWest', 'FontSize', 10, 'FontName', 'Arial', 'Box', 'off');
 grid on
 
 % 调整整体布局
 set(gcf, 'Position', [100, 100, 1200, 675]); % 调整窗口大小为 16:9
 
 % 导出为 PDF 矢量图
-exportgraphics(gcf, 'Hardware_vs_Software_16_9.pdf', 'ContentType', 'vector');
+exportgraphics(gcf, 'CumulativeError_Hardware_vs_Software_16_9.pdf', 'ContentType', 'vector');
 
 % 如果需要使用传统方法：
 % print(gcf, 'Hardware_vs_Software_16_9', '-dpdf', '-painters');
+
+%% 拆分 figure(2001) 为 figure(201)/(202) 并分别导出 PDF（去标题/去KDE，其他保持一致）
+
+% figure 201: 原左侧子图（optical receiver, cumu）
+figure(201);
+set(gcf, 'Units', 'pixels', 'Position', [100, 100, 400, 350]);
+h1 = histogram(period_show_hw, 'Normalization', 'pdf');
+h1.DisplayName = 'Histogram';
+h1.EdgeColor = "black";
+h1.FaceColor = "#e89776";
+h1.FaceAlpha = 0.7;
+hold on
+yMax = max(h1.Values);
+hTheory = xline(theoretical_value, 'r-', 'LineWidth', 2, 'DisplayName', 'Theoretical Value');
+ylim_vals = ylim;
+hFill = fill([theoretical_value - delta, theoretical_value + delta, theoretical_value + delta, theoretical_value - delta], ...
+    [ylim_vals(1), ylim_vals(1), ylim_vals(2), ylim_vals(2)], ...
+    [0.66, 0.82, 0.55], 'FaceAlpha', 0.3, 'EdgeColor', 'none', 'DisplayName', '40 ppm Range');
+in_range = sum((period_show_hw >= (theoretical_value - delta)) & (period_show_hw <= (theoretical_value + delta))) / length(period_show_hw) * 100;
+% xlabel('Sync light periods read by SCUM optical receiver (ms)', 'FontSize', 14, 'FontName', 'Arial');
+ylabel('Counts', 'FontSize', 14, 'FontName', 'Arial');
+title(sprintf('(within 40ppm=%.2f%%)', in_range), 'FontSize', 12, 'FontName', 'Arial');
+legend([h1, hTheory, hFill], ...
+    {'Histogram', 'Theoretical Value', '40 ppm Range'}, ...
+    'Location', 'NorthWest', 'FontSize', 10, 'FontName', 'Arial', 'Box', 'off');
+grid on
+xlabel('');
+exportgraphics(gcf, 'figure_201.pdf', 'ContentType', 'vector');
+
+% figure 202: 原右侧子图（SCUM IO, cumu）
+figure(202);
+set(gcf, 'Units', 'pixels', 'Position', [100, 100, 400, 350]);
+h2 = histogram(period_show_sw, 'Normalization', 'pdf');
+h2.DisplayName = 'Histogram';
+h2.EdgeColor = "black";
+h2.FaceColor = "#76a6e8";
+h2.FaceAlpha = 0.7;
+hold on
+yMax = max(h2.Values);
+hTheory = xline(theoretical_value, 'r-', 'LineWidth', 2, 'DisplayName', 'Theoretical Value');
+ylim_vals = ylim;
+hFill = fill([theoretical_value - delta, theoretical_value + delta, theoretical_value + delta, theoretical_value - delta], ...
+    [ylim_vals(1), ylim_vals(1), ylim_vals(2), ylim_vals(2)], ...
+    [0.66, 0.82, 0.55], 'FaceAlpha', 0.3, 'EdgeColor', 'none', 'DisplayName', '40 ppm Range');
+in_range = sum((period_show_sw >= (theoretical_value - delta)) & (period_show_sw <= (theoretical_value + delta))) / length(period_show_sw) * 100;
+% xlabel('Sync light periods read by SCUM IO (ms)', 'FontSize', 14, 'FontName', 'Arial');
+ylabel('Counts', 'FontSize', 14, 'FontName', 'Arial');
+title(sprintf('(within 40ppm=%.2f%%)', in_range), 'FontSize', 12, 'FontName', 'Arial');
+legend([h2, hTheory, hFill], ...
+    {'Histogram', 'Theoretical Value', '40 ppm Range'}, ...
+    'Location', 'NorthWest', 'FontSize', 10, 'FontName', 'Arial', 'Box', 'off');
+grid on
+xlabel('');
+exportgraphics(gcf, 'figure_202.pdf', 'ContentType', 'vector');
 
 %% 高斯分布的假设检验
 
