@@ -379,7 +379,9 @@ exportgraphics(gcf, 'Hardware_vs_Software_16_9.pdf', 'ContentType', 'vector');
 %% 拆分 figure(1042) 为 figure(101)/(102) 并分别导出 PDF（去标题/去KDE，其他保持一致）
 
 % figure 101: 原左侧子图（optical receiver）
+
 figure(101);
+set(gca, 'FontName', 'Arial');
 set(gcf, 'Units', 'pixels', 'Position', [100, 100, 400, 350]);
 h1 = histogram(period_show_hw, 'Normalization', 'pdf');
 h1.DisplayName = 'Histogram';
@@ -395,6 +397,7 @@ hFill = fill([theoretical_value - delta, theoretical_value + delta, theoretical_
     [ylim_vals(1), ylim_vals(1), ylim_vals(2), ylim_vals(2)], ...
     [0.66, 0.82, 0.55], 'FaceAlpha', 0.3, 'EdgeColor', 'none', 'DisplayName', '40 ppm Range');
 in_range = sum((period_show_hw >= (theoretical_value - delta)) & (period_show_hw <= (theoretical_value + delta))) / length(period_show_hw) * 100;
+set(gca, 'FontName', 'Arial');
 % xlabel('Sync pulse periods read by SCUM optical receiver (ms)', 'FontSize', 14, 'FontName', 'Arial');
 ylabel('Counts', 'FontSize', 14, 'FontName', 'Arial');
 title(sprintf('(within 40ppm=%.2f%%)', in_range), 'FontSize', 12, 'FontName', 'Arial');
@@ -407,6 +410,7 @@ exportgraphics(gcf, 'figure_101.pdf', 'ContentType', 'vector');
 
 % figure 102: 原右侧子图（SCUM IO）
 figure(102);
+set(gca, 'FontName', 'Arial');
 set(gcf, 'Units', 'pixels', 'Position', [100, 100, 400, 350]);
 h2 = histogram(period_show_sw, 'Normalization', 'pdf');
 h2.DisplayName = 'Histogram';
@@ -421,8 +425,10 @@ hFill = fill([theoretical_value - delta, theoretical_value + delta, theoretical_
     [ylim_vals(1), ylim_vals(1), ylim_vals(2), ylim_vals(2)], ...
     [0.66, 0.82, 0.55], 'FaceAlpha', 0.3, 'EdgeColor', 'none', 'DisplayName', '40 ppm Range');
 in_range = sum((period_show_sw >= (theoretical_value - delta)) & (period_show_sw <= (theoretical_value + delta))) / length(period_show_sw) * 100;
+
 % xlabel('Sync pulse periods read by SCUM IO (ms)', 'FontSize', 14, 'FontName', 'Arial');
 ylabel('Counts', 'FontSize', 14, 'FontName', 'Arial');
+
 title(sprintf('(within 40ppm=%.2f%%)', in_range), 'FontSize', 12, 'FontName', 'Arial');
 legend([h2, hTheory, hFill], ...
     {'Histogram', 'Theoretical Value', '40 ppm Range'}, ...
@@ -658,6 +664,7 @@ exportgraphics(gcf, 'CumulativeError_Hardware_vs_Software_16_9.pdf', 'ContentTyp
 
 % figure 201: 原左侧子图（optical receiver, cumu）
 figure(201);
+set(gca, 'FontName', 'Arial');
 set(gcf, 'Units', 'pixels', 'Position', [100, 100, 400, 350]);
 h1 = histogram(period_show_hw, 'Normalization', 'pdf');
 h1.DisplayName = 'Histogram';
@@ -672,6 +679,7 @@ hFill = fill([theoretical_value - delta, theoretical_value + delta, theoretical_
     [ylim_vals(1), ylim_vals(1), ylim_vals(2), ylim_vals(2)], ...
     [0.66, 0.82, 0.55], 'FaceAlpha', 0.3, 'EdgeColor', 'none', 'DisplayName', '40 ppm Range');
 in_range = sum((period_show_hw >= (theoretical_value - delta)) & (period_show_hw <= (theoretical_value + delta))) / length(period_show_hw) * 100;
+set(gca, 'FontName', 'Arial');
 % xlabel('Sync light periods read by SCUM optical receiver (ms)', 'FontSize', 14, 'FontName', 'Arial');
 ylabel('Counts', 'FontSize', 14, 'FontName', 'Arial');
 title(sprintf('(within 40ppm=%.2f%%)', in_range), 'FontSize', 12, 'FontName', 'Arial');
@@ -684,6 +692,7 @@ exportgraphics(gcf, 'figure_201.pdf', 'ContentType', 'vector');
 
 % figure 202: 原右侧子图（SCUM IO, cumu）
 figure(202);
+set(gca, 'FontName', 'Arial');
 set(gcf, 'Units', 'pixels', 'Position', [100, 100, 400, 350]);
 h2 = histogram(period_show_sw, 'Normalization', 'pdf');
 h2.DisplayName = 'Histogram';
@@ -698,6 +707,8 @@ hFill = fill([theoretical_value - delta, theoretical_value + delta, theoretical_
     [ylim_vals(1), ylim_vals(1), ylim_vals(2), ylim_vals(2)], ...
     [0.66, 0.82, 0.55], 'FaceAlpha', 0.3, 'EdgeColor', 'none', 'DisplayName', '40 ppm Range');
 in_range = sum((period_show_sw >= (theoretical_value - delta)) & (period_show_sw <= (theoretical_value + delta))) / length(period_show_sw) * 100;
+
+set(gca, 'FontName', 'Arial');
 % xlabel('Sync light periods read by SCUM IO (ms)', 'FontSize', 14, 'FontName', 'Arial');
 ylabel('Counts', 'FontSize', 14, 'FontName', 'Arial');
 title(sprintf('(within 40ppm=%.2f%%)', in_range), 'FontSize', 12, 'FontName', 'Arial');

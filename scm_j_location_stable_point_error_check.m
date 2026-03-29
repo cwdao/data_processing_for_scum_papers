@@ -202,11 +202,15 @@ filtered_data_y2 = point_stable_y2(~outliers_y2x & ~outliers_y2y, :);
 
 % scatter(point_calibed_xy(:,1),point_calibed_xy(:,2),point_stable(:,1),point_stable(:,2))
 % 创建图形窗口
-figure;
+
+% 创建图窗，并设置尺寸
+fig = figure;
+fig.Units = 'centimeters';
+fig.Position = [5, 5, 14, 14];   % [left, bottom, width, height]
 % 合并四个数组为一个
 all_data = [filtered_data_x1; filtered_data_y1; filtered_data_x2; filtered_data_y2];
 % 绘制所有点
-figure;
+% figure;
 scatter(all_data(:,1), all_data(:,2), 'filled', 'MarkerFaceColor', [0.2, 0.6, 0.9], 'MarkerEdgeColor', 'none');
 hold on; % 保持当前图形
 % % 绘制第一个数组
@@ -229,9 +233,12 @@ hold on; % 保持当前图形
 % hold on; % 保持当前图形
 
 % 添加图例
+set(gca, 'FontName', 'Arial');
 % legend('x1', 'y1', 'x2', 'y2');
 axis equal
 % 添加标题和标签
+ax = gca;          % 获取当前坐标轴
+ax.FontSize = 20;  % 设置 x/y tick 字体大小
 % title('Real-time Position of the Chip');
 xlabel('X-axis (mm)');
 ylabel('Y-axis (mm)');
@@ -250,16 +257,18 @@ hold on;
 % for i = 1:length(x)-1
 %     text(x(i), y(i), sprintf('(%d, %d)', x(i), y(i)), 'FontSize', 10, 'Color', 'blue');
 % end
-legend('Lighthouse Tracking','Ground Truth');
+legend('Lighthouse Tracking','Ground Truth','FontSize',20,'FontName', 'Arial');
 box on  % 打开坐标轴边框
 % 添加标题和标签
 % title('Real-time Position of SCUM');
-xlabel('X-axis (mm)', 'FontSize', 12);
-ylabel('Y-axis (mm)', 'FontSize', 12);
+xlabel('X-axis (mm)', 'FontSize', 24,'FontName', 'Arial');
+ylabel('Y-axis (mm)', 'FontSize', 24,'FontName', 'Arial');
 
 % 设置坐标轴比例和范围
 axis equal; % 保持 X 和 Y 轴比例一致
 grid on;
+
+exportgraphics(gcf, 'tracking_trace.pdf', 'ContentType', 'vector');
 
 %% matlab 没有小提琴图，转python 了
 % 获取当前日期和时间

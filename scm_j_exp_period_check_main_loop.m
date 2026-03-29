@@ -78,7 +78,7 @@ h101 = histogram(period_show);
 h101.EdgeColor = "black";
 h101.FaceColor = "#e89776";
 h101.LineWidth = 1;
-set(gca,'FontName','Times New Roman','FontSize',24,'linewidth',1.5, ...
+set(gca,'FontName','Arial','FontSize',24,'linewidth',1.5, ...
     'XMinorGrid','on','YMinorGrid','on','box','on');
 
 % figure(103)
@@ -93,5 +93,5 @@ h101 = histogram(period_show);
 h101.EdgeColor = "black";
 h101.FaceColor = "#61cbf4";
 h101.LineWidth = 1;
-set(gca,'FontName','Times New Roman','FontSize',24,'linewidth',1.5, ...
+set(gca,'FontName','Arial','FontSize',24,'linewidth',1.5, ...
     'XMinorGrid','on','YMinorGrid','on','box','on');
